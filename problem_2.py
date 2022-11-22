@@ -16,13 +16,10 @@ def location(phi, theta):
     t = distance / c
 
     ret_dict = {'A':A, 'B':B, 'C':C, 'distance':distance, 't':t}
-    #print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
+    print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
     return ret_dict
 
 #Problem 3 starts here:
-corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
-corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
-incorr_phi = [pi/8 + 10e-8, pi/6 + 10e-8, 3*pi/8 - 10e-8, pi/4 - 10e-8]
 
 #Constants
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
