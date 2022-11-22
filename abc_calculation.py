@@ -4,7 +4,7 @@ import numpy as np
 from numpy import sin, cos, sqrt, pi, linalg as LA
 
 rho = 26570
-error = 10**(-8)
+error = 10e-8
 
 phis = [pi/8, pi/6, 3*pi/8, pi/4]
 thetas = [-pi/4, pi/2, 2*pi/3, pi/6]
