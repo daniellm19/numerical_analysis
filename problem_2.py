@@ -16,7 +16,7 @@ def location(phi, theta):
     t = distance / c
 
     ret_dict = {'A':A, 'B':B, 'C':C, 'distance':distance, 't':t}
-    print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
+    #print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
     return ret_dict
 
 #Problem 3 starts here:
