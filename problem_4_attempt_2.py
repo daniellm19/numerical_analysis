@@ -12,8 +12,8 @@ Z = 6370        # [km]
 D = 0           # [s]   # This can be anything, just starts at 0
 
 # Errors
-err = 10e-8
-toll_err = 10e-6
+err = 1e-8
+toll_err = 1e-6
 # An example location of satellites
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]       # Altitude
 corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]    # Polar angle (azimuth)
@@ -91,7 +91,7 @@ def main():
     incorr_phis = add_plus_min_err_to_list(err, corr_phi)
     all_lenghts = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 0.1, incorr_phi)
+        x,y,z,d = newtonmult(x0, toll_err, incorr_phi)
         print('The error is:')
         print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))

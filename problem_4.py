@@ -20,7 +20,7 @@ def location(phi, theta):
 
 
 
-err = 10e-8
+err = 1e-8
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
 corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
 
@@ -35,18 +35,6 @@ def get_incorr_phis():
              [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 - err],
              [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 + err]]
     return incorr_phis
-
-
-'''
-incorr_phis = [[pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 - err],
-             [pi/8 + err, pi/6 + err, 3*pi/8 - err, pi/4 + err], [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 + err], 
-             [pi/8 - err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 - err],
-             [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 + err],
-             [pi/8 + err, pi/6 + err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 + err, pi/4 - err],
-             [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 + err],
-             [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 - err],
-             [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 + err]]
-'''
 
 def getABCt(incorr_phi):
     A, B, C, t = [], [], [], []

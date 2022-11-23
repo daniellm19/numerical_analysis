@@ -24,7 +24,7 @@ def location(phi, theta):
 #Constants
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
 corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
-incorr_phi = [pi/8 + 10e-8, pi/6 + 10e-8, 3*pi/8 - 10e-8, pi/4 - 10e-8]
+incorr_phi = [pi/8 + 1e-8, pi/6 + 1e-8, 3*pi/8 - 1e-8, pi/4 - 1e-8]
 A, B, C, t = [], [], [], []
 for i in range(len(corr_phi)):
     t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
@@ -64,7 +64,7 @@ def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    x,y,z,d = newtonmult(x0, 0.1)
+    x,y,z,d = newtonmult(x0, 0.00001)
     print('The error is:')
     print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return 0
