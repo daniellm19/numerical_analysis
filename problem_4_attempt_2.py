@@ -1,13 +1,15 @@
 import numpy as np 
 from numpy import sin, cos, sqrt, pi, linalg as LA
 import matplotlib.pyplot as pst
-import itertools
+from sympy.utilities.iterables import multiset_permutations
 
 rho = 26570 # kilometers
 c = 299792.458 # speed of light [km/s]
 X = 0
 Y = 0
 Z = 6370
+
+err = 10e-8
 
 def location(phi, theta):
     A = rho * sin(phi) * cos(theta) if abs(rho * sin(phi) * cos(theta)) > 1e-10 else 0
@@ -61,24 +63,26 @@ def newtonmult(x0,tol):
         x=x+s
     return(x)
 
-def combinations(items):
+def all_plus_min(value: int, length: int):
+    """Takes in a value and the length of the list of that value, 
+    and generates all possible plus/minus value versions of that list"""
     matrix = []
+    items = [value] * length
     for i in range(0,len(items)+1):
         items_copy = items.copy()
         for j in range(0,i):
             items_copy[j] = -items[j]
-        matrix.append(items_copy)
+        multiset_perm = multiset_permutations(items_copy)
+        for i in multiset_perm:
+            matrix.append(i)
     return matrix
     
 
 def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
-    val = [1, 1, 1, 1]
-    matrix = combinations(val)
+    matrix = all_plus_min(err, 4)
     print(matrix)
-    matrix2 = list(itertools.permutations(matrix[0]))
-    print(matrix2)
 
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
     x,y,z,d = newtonmult(x0, 0.1)
