@@ -4,11 +4,18 @@ from numpy import linalg as LA
 
 
 # Constants
-c = 299792.458 #Speed of light[km/s]
-A = [15600, 18760, 17610, 19170]         #Vector of distances in plane A[km]
-B = [7540, 2750, 14630, 610]             #Vector of distances in plane B[km]
-C = [20140, 18610, 13480, 18390]         #Vector of distances in plane C[km]
-t = [0.07074, 0.07220, 0.07690, 0.07242] #Vector of time for each sat t[s]
+c = 299792.458                           # Speed of light[km/s]
+A = [15600, 18760, 17610, 19170]         # Vector of distances in plane A[km]
+B = [7540, 2750, 14630, 610]             # Vector of distances in plane B[km]
+C = [20140, 18610, 13480, 18390]         # Vector of distances in plane C[km]
+t = [0.07074, 0.07220, 0.07690, 0.07242] # Vector of time for each sat t[s]
+X = 0                                    # [km]
+Y = 0                                    # [km]  # X, Y, and Z are the north pole (where the receiver is)
+Z = 6370                                 # [km]
+D = 0                                    # [s]   # This can be anything, just starts at 0
+
+# Errors
+toll_err = 1e-8
 
 
 def F(x):
@@ -22,11 +29,10 @@ def F(x):
 def DF(x):
     """Creates each row of jacobi matrix independently(Hard coded) takes in a 4x1 vector
     of initial conditions and creates a matrix which is returned"""
-    l1 = [(2*(x[0]-A[0])), (2*(x[1]-B[0])), (2*(x[2]-C[0])), (2*pow(c,2)* (t[0]-x[3]))]
-    l2 = [(2*(x[0]-A[1])), (2*(x[1]-B[1])), (2*(x[2]-C[1])), (2*pow(c,2)* (t[1]-x[3]))]
-    l3 = [(2*(x[0]-A[2])), (2*(x[1]-B[2])), (2*(x[2]-C[2])), (2*pow(c,2)* (t[2]-x[3]))]
-    l4 = [(2*(x[0]-A[3])), (2*(x[1]-B[3])), (2*(x[2]-C[3])), (2*pow(c,2)* (t[3]-x[3]))]
-    return np.array([l1,l2,l3,l4])
+    eq_list = [0,0,0,0]
+    for i in range(0, len(eq_list)):
+        eq_list[i] = [(2*(x[0]-A[i])), (2*(x[1]-B[i])), (2*(x[2]-C[i])), (2*pow(c,2)* (t[i]-x[3]))]
+    return np.array(eq_list)
 
 def newtonmult(x0,tol):
     '''x0 er vigur i R^n skilgreindur t.d. sem
@@ -43,8 +49,8 @@ def newtonmult(x0,tol):
 def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
-    x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    x,y,z,d = newtonmult(x0, 0.00000001)
+    x0 = np.array([X,Y,Z,D]) #Initial guess for newtons method
+    x,y,z,d = newtonmult(x0, toll_err)
     print("Final answers: \n")
     print("x is {:.6f} \t".format(x))
     print("y is {:.6f} \t".format(y))

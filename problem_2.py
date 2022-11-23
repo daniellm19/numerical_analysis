@@ -42,11 +42,10 @@ def F(x):
 def DF(x):
     '''Creates each row of jacobi matrix independently(Hard coded) takes in a 4x1 vector
     of initial conditions and creates a matrix which is returned'''
-    l1 = [(2*(x[0]-A[0])), (2*(x[1]-B[0])), (2*(x[2]-C[0])), (2*pow(c,2)* (t[0]-x[3]))]
-    l2 = [(2*(x[0]-A[1])), (2*(x[1]-B[1])), (2*(x[2]-C[1])), (2*pow(c,2)* (t[1]-x[3]))]
-    l3 = [(2*(x[0]-A[2])), (2*(x[1]-B[2])), (2*(x[2]-C[2])), (2*pow(c,2)* (t[2]-x[3]))]
-    l4 = [(2*(x[0]-A[3])), (2*(x[1]-B[3])), (2*(x[2]-C[3])), (2*pow(c,2)* (t[3]-x[3]))]
-    return np.array([l1,l2,l3,l4])
+    eq_list = [0,0,0,0]
+    for i in range(0, len(eq_list)):
+        eq_list[i] = [(2*(x[0]-A[i])), (2*(x[1]-B[i])), (2*(x[2]-C[i])), (2*pow(c,2)* (t[i]-x[3]))]
+    return np.array(eq_list)
 
 def newtonmult(x0,tol):
     '''x0 er vigur i R^n skilgreindur t.d. sem
