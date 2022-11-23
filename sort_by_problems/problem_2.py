@@ -11,9 +11,9 @@ def location(phi, theta):
     distance = sqrt(pow((x - A), 2) + pow((y - B), 2) + pow((z - C), 2))
     t = distance / 299792.458
 
-    print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
+    str_output = 'A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n'
     
-    return
+    return str_output
 
 #Problem 3 starts here:
 
