@@ -63,25 +63,29 @@ def newtonmult(x0,tol):
         x=x+s
     return(x)
 
-def all_plus_min(value: int, length: int):
-    """Takes in a value and the length of the list of that value, 
-    and generates all possible plus/minus value versions of that list"""
-    matrix = []
-    items = [value] * length
-    for i in range(0,len(items)+1):
-        items_copy = items.copy()
+def add_plus_min_err_to_list(err: int, a_list: list):
+    """Takes in a error and the list of values to add the combinations of errors to"""
+    all_err_perm = []
+    err_list = [err] * len(a_list)
+    for i in range(0,len(err_list)+1):
+        err_copy = err_list.copy()
         for j in range(0,i):
-            items_copy[j] = -items[j]
-        multiset_perm = multiset_permutations(items_copy)
+            err_copy[j] = -err_list[j]
+        multiset_perm = multiset_permutations(err_copy)
         for i in multiset_perm:
-            matrix.append(i)
-    return matrix
+            all_err_perm.append(i)
+
+    # Adds all of the error permutations to the a_list
+    all_perms = [[a + b for a, b in zip(all_err_perm[i], corr_phi)] for i in range(len(all_err_perm))]
+
+    return all_perms
     
 
 def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
-    matrix = all_plus_min(err, 4)
+
+    matrix = add_plus_min_err_to_list(err, corr_phi)
     print(matrix)
 
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
