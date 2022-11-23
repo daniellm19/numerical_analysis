@@ -1,6 +1,7 @@
 import numpy as np 
 from numpy import sin, cos, sqrt, pi, linalg as LA
 import matplotlib.pyplot as pst
+from sympy.utilities.iterables import multiset_permutations
 
 rho = 26570 # kilometers
 c = 299792.458 # speed of light [km/s]
@@ -24,17 +25,23 @@ err = 1e-8
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
 corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
 
-def get_incorr_phis():
-    all_incorr_phis = []
-    incorr_phis = [[pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 - err],
-             [pi/8 + err, pi/6 + err, 3*pi/8 - err, pi/4 + err], [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 + err], 
-             [pi/8 - err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 - err],
-             [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 + err],
-             [pi/8 + err, pi/6 + err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 + err, pi/4 - err],
-             [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 + err],
-             [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 - err],
-             [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 + err]]
-    return incorr_phis
+def get_incorr_phis(err: int, a_list: list):
+    """Takes in a error and the list of values to add the combinations of errors to"""
+    all_err_perm = []
+    err_list = [err] * len(a_list)
+    for i in range(0,len(err_list)+1):
+        err_copy = err_list.copy()
+        for j in range(0,i):
+            err_copy[j] = -err_list[j]
+        multiset_perm = multiset_permutations(err_copy)
+        for i in multiset_perm:
+            all_err_perm.append(i)
+
+    # Adds all of the error permutations to the a_list
+    all_perms = [[a + b for a, b in zip(all_err_perm[i], corr_phi)] for i in range(len(all_err_perm))]
+
+    return all_perms
+
 
 def getABCt(incorr_phi):
     A, B, C, t = [], [], [], []
@@ -78,10 +85,10 @@ def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    incorr_phis = get_incorr_phis()
+    incorr_phis = get_incorr_phis(err, corr_phi)
     all_lenghts = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 0.1, incorr_phi)
+        x,y,z,d = newtonmult(x0, 10e-9, incorr_phi)
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     print('The maximum error is:', max(all_lenghts))
     
