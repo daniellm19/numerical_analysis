@@ -131,12 +131,13 @@ def distance_w_error(theta: list, phi: list, err: int, sat_amount: int):
 
 def main():
     sat_pos_amount = 100 
-    sat_amount = 7
+    min_sat_amount = 5
+    sat_amount = 9
     all_all_errors = []
     max_errors = []
     min_errors = []
     mean_errors = []
-    for sat_amount in range(5, sat_amount+1):
+    for sat_amount in range(min_sat_amount, sat_amount+1):
         all_errors = []
 
         rand_thetas, rand_phis = random_angles(sat_pos_amount, sat_amount)
@@ -161,7 +162,7 @@ def main():
         plt.setp(bp['fliers'], markersize=3.0)
         fig.savefig(f'figures/sat_num_{sat_amount}.png')
 
-        if sat_amount == 5:
+        if sat_amount <= min_sat_amount:
             continue
 
         max_errors.append(max_error)
@@ -177,9 +178,6 @@ def main():
     plt.setp(bp['whiskers'], color='k', linestyle='-')
     plt.setp(bp['fliers'], markersize=3.0)
     fig.savefig(f'figures/all_sats.png')
-
-    print([i for i in range(6, sat_amount+1)])
-    print(max_errors)
 
     plt.clf()
     plt.plot([i for i in range(6, sat_amount+1)], max_errors, label="max")
