@@ -118,29 +118,78 @@ def newton_gauss(x0: list, tol: int, theta: list, phi: list, incorr_phi: list, r
         x = x+s
     return(x)
 
-def distance_w_error(theta: list, phi: list, err: int):
+def distance_w_error(theta: list, phi: list, err: int, sat_amount: int):
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
     incorr_phis = get_incorr_phis(err, phi)
     all_lenghts = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newton_gauss(x0, err, theta, phi, incorr_phi, 5)
+        x,y,z,d = newton_gauss(x0, err, theta, phi, incorr_phi, sat_amount)
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return all_lenghts
 
 def main():
-    all_errors = []
-    rand_thetas, rand_phis = random_angles(100,5)
-    for i in range(len(rand_phis)):
-        max_error = max(distance_w_error(rand_thetas[i], rand_phis[i], err))
-        all_errors.append(max_error)
-    print('Max error in distance:', max(all_errors))
-    print('Min error in distance:', min(all_errors))
-    print('Average:', mean(all_errors))
-    print('Standard deviation:', std(all_errors))
-    fig = plt.figure(figsize =(10, 7))    
-    plt.boxplot(all_errors)  
+    sat_pos_amount = 100 
+    sat_amount = 7
+    all_all_errors = []
+    max_errors = []
+    min_errors = []
+    mean_errors = []
+    for sat_amount in range(5, sat_amount+1):
+        all_errors = []
+
+        rand_thetas, rand_phis = random_angles(sat_pos_amount, sat_amount)
+        for i in range(len(rand_phis)):
+            max_error = max(distance_w_error(rand_thetas[i], rand_phis[i], err, sat_amount))
+            all_errors.append(max_error)
+
+        max_error = max(all_errors)
+        min_error = min(all_errors)
+        mean_error = mean(all_errors)
+        print('Max error in distance:', max_error)
+        print('Min error in distance:', min_error)
+        print('Mean error in distance:', mean_error)
+        print(f'Standard deviation: {std(all_errors)}\n')
+
+        fig, ax = plt.subplots()
+        ax.set_xlabel('Satellite amount')
+        ax.set_ylabel('Error [km]')
+        ax.set_title(f'Error w.r.t {sat_amount} satellites for Newton-Gauss')
+        bp = ax.boxplot(all_errors)  
+        plt.setp(bp['whiskers'], color='k', linestyle='-')
+        plt.setp(bp['fliers'], markersize=3.0)
+        fig.savefig(f'figures/sat_num_{sat_amount}.png')
+
+        if sat_amount == 5:
+            continue
+
+        max_errors.append(max_error)
+        min_errors.append(min_error)
+        mean_errors.append(mean_error)
+        all_all_errors.append(all_errors)
+
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Satellite amount')
+    ax.set_ylabel('Error [km]')
+    ax.set_title('Error w.r.t the amount of satellites for Newton-Gauss')
+    bp = ax.boxplot(all_all_errors, positions=[i for i in range(6, sat_amount+1)])  
+    plt.setp(bp['whiskers'], color='k', linestyle='-')
+    plt.setp(bp['fliers'], markersize=3.0)
+    fig.savefig(f'figures/all_sats.png')
+
+    print([i for i in range(6, sat_amount+1)])
+    print(max_errors)
+
+    plt.clf()
+    plt.plot([i for i in range(6, sat_amount+1)], max_errors, label="max")
+    plt.plot([i for i in range(6, sat_amount+1)], min_errors, label="min")
+    plt.plot([i for i in range(6, sat_amount+1)], mean_errors, label="mean")
+    plt.xlabel("Satellite amount")
+    plt.ylabel("Error [km]")
+    plt.title("Different errors w.r.t. satellite amount with Newton-Gauss")
+    plt.legend(loc='best')
+    plt.xticks(np.arange(6, sat_amount+1, 1))
     plt.show()
 
 main()
