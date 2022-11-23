@@ -3,13 +3,20 @@ from numpy import sin, cos, sqrt, pi, linalg as LA
 import matplotlib.pyplot as pst
 from sympy.utilities.iterables import multiset_permutations
 
-rho = 26570 # kilometers
-c = 299792.458 # speed of light [km/s]
-X = 0
-Y = 0
-Z = 6370
+# All defined constants for the newton method
+rho = 26570     # altitude of satellites [km]
+c = 299792.458  # speed of light [km/s]
+X = 0           # [km]
+Y = 0           # [km]  # X, Y, and Z are the north pole (where the receiver is)
+Z = 6370        # [km]
+D = 0           # [s]   # This can be anything, just starts at 0
 
+# Errors
 err = 10e-8
+toll_err = 10e-6
+# An example location of satellites
+corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]       # Altitude
+corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]    # Polar angle (azimuth)
 
 def location(phi, theta):
     A = rho * sin(phi) * cos(theta) if abs(rho * sin(phi) * cos(theta)) > 1e-10 else 0
@@ -19,30 +26,25 @@ def location(phi, theta):
     t = distance / c
 
     ret_dict = {'A':A, 'B':B, 'C':C, 'distance':distance, 't':t}
-    #print('A =', A, 'km\nB =', B, 'km\nC =', C, 'km\nDistance from north pole =', distance, 'km\nt =', t, 'sec\n\n')
     return ret_dict
 
-#Problem 3 starts here:
+def getABCt(incorr_phi):
+    A, B, C, t = [], [], [], []
+    for i in range(len(corr_phi)):
+        t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
+        values = location(incorr_phi[i], corr_theta[i]) #Derived from prerceived values
+        A.append(values['A']) #Vector of distances in plane A[km]
+        B.append(values['B']) #Vector of distances in plane B[km]
+        C.append(values['C']) #Vector of distances in plane C[km]
+    return A, B, C, t
 
-#Constants
-corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
-corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
-incorr_phi = [pi/8 + 10e-8, pi/6 + 10e-8, 3*pi/8 - 10e-8, pi/4 - 10e-8]
-A, B, C, t = [], [], [], []
-for i in range(len(corr_phi)):
-    t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
-    values = location(incorr_phi[i], corr_theta[i]) #Derived from prerceived values
-    A.append(values['A']) #Vector of distances in plane A[km]
-    B.append(values['B']) #Vector of distances in plane B[km]
-    C.append(values['C']) #Vector of distances in plane C[km]
-
-def F(x):
+def F(x, A, B, C, t):
     funcs = []
     for i in range(4):
         funcs.append(pow((x[0]-A[i]), 2) + pow((x[1]-B[i]),2) + pow((x[2]-C[i]),2) - pow(c,2) * pow((t[i]-x[3]), 2))
     return funcs
 
-def DF(x):
+def DF(x, A, B, C, t):
     '''Creates each row of jacobi matrix independently(Hard coded) takes in a 4x1 vector
     of initial conditions and creates a matrix which is returned'''
     l1 = [(2*(x[0]-A[0])), (2*(x[1]-B[0])), (2*(x[2]-C[0])), (2*pow(c,2)* (t[0]-x[3]))]
@@ -51,17 +53,19 @@ def DF(x):
     l4 = [(2*(x[0]-A[3])), (2*(x[1]-B[3])), (2*(x[2]-C[3])), (2*pow(c,2)* (t[3]-x[3]))]
     return np.array([l1,l2,l3,l4])
 
-def newtonmult(x0,tol):
+def newtonmult(x0, tol, incorr_phi):
     '''x0 er vigur i R^n skilgreindur t.d. sem
     x0=np.array([1,2,3])
     gert ráð fyrir að F(x) og Jacobi fylki DF(x) séu skilgreind annars staðar'''
     x=x0
     oldx=x+2*tol
+    A, B, C, t = getABCt(incorr_phi)
     while LA.norm(x-oldx, np.inf)>tol:
         oldx=x
-        s=-LA.solve(DF(x),F(x))
+        s=-LA.solve(DF(x, A, B, C, t),F(x, A, B, C, t))
         x=x+s
     return(x)
+
 
 def add_plus_min_err_to_list(err: int, a_list: list):
     """Takes in a error and the list of values to add the combinations of errors to"""
@@ -79,20 +83,19 @@ def add_plus_min_err_to_list(err: int, a_list: list):
     all_perms = [[a + b for a, b in zip(all_err_perm[i], corr_phi)] for i in range(len(all_err_perm))]
 
     return all_perms
-    
 
 def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
-
-    matrix = add_plus_min_err_to_list(err, corr_phi)
-    print(matrix)
-
-    x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    x,y,z,d = newtonmult(x0, 0.1)
-    print('The error is:')
-    print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-    return 0
+    x0 = np.array([X,Y,Z,D]) #Initial guess for newtons method
+    incorr_phis = add_plus_min_err_to_list(err, corr_phi)
+    all_lenghts = []
+    for incorr_phi in incorr_phis:
+        x,y,z,d = newtonmult(x0, 0.1, incorr_phi)
+        print('The error is:')
+        print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+        all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    print(all_lenghts)
     
 main()
 
