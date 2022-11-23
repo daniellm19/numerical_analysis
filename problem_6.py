@@ -2,6 +2,7 @@ import numpy as np
 from numpy import sin, cos, sqrt, pi, mean, std, linalg as LA
 import matplotlib.pyplot as plt
 import random
+from sympy.utilities.iterables import multiset_permutations
 
 #constants
 rho = 26570 # kilometers
@@ -14,7 +15,7 @@ def random_angles():
     '''Generates 200 random positions for four sattelites each'''
     rand_phis = []
     rand_thetas = []
-    for i in range(0,200):
+    for i in range(0,100):
         rand_phi = []
         rand_theta = []
         for j in range(0,4):
@@ -36,13 +37,24 @@ def location(phi, theta):
 
 
 
-err = 10e-8
-corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
-corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
+err = 1e-8
 
-def get_incorr_phis():
-    all_incorr_phis = []
-    return all_incorr_phis
+def get_incorr_phis(err: int, a_list: list):
+    """Takes in a error and the list of values to add the combinations of errors to"""
+    all_err_perm = []
+    err_list = [err] * len(a_list)
+    for i in range(0,len(err_list)+1):
+        err_copy = err_list.copy()
+        for j in range(0,i):
+            err_copy[j] = -err_list[j]
+        multiset_perm = multiset_permutations(err_copy)
+        for i in multiset_perm:
+            all_err_perm.append(i)
+
+    # Adds all of the error permutations to the a_list
+    all_perms = [[a + b for a, b in zip(all_err_perm[i], a_list)] for i in range(len(all_err_perm))]
+
+    return all_perms
 
 
 '''
@@ -98,31 +110,30 @@ def distance_w_error(theta, phi):
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    incorr_phis = get_incorr_phis()
+    incorr_phis = get_incorr_phis(err, phi)
     all_lenghts = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 0.1, theta, phi, incorr_phi)
-        print('The error is:')
-        print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+        x,y,z,d = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return all_lenghts
 
 def main():
-    all_d_w_error = []
+    all_errors = []
     rand_thetas, rand_phis = random_angles()
-    for i in range(len(rand_thetas)):
-        lenght = distance_w_error(rand_thetas[i], rand_phis[i])
-        all_d_w_error.append(lenght)
-    print('Max error in distance:', max(all_d_w_error))
-    print('Min error in distance:', min(all_d_w_error))
-    print('Average:', mean(all_d_w_error))
-    print('Standard deviation:', std(all_d_w_error))
-    plt.plot(all_d_w_error, 'ro')
-    plt.ylabel('Error in distance')
+    for i in range(len(rand_phis)):
+        max_error = max(distance_w_error(rand_thetas[i], rand_phis[i]))
+        all_errors.append(max_error)
+    print('Max error in distance:', max(all_errors))
+    print('Min error in distance:', min(all_errors))
+    print('Average:', mean(all_errors))
+    print('Standard deviation:', std(all_errors))
+    fig = plt.figure(figsize =(10, 7))    
+    plt.boxplot(all_errors)  
     plt.show()
 
-    
-main()
-
+import time
 if __name__ == "__main__":
-    print(main)
+    main()
+
+
+
