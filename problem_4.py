@@ -23,6 +23,15 @@ def location(phi, theta):
 err = 10e-8
 corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
 corr_theta = [-pi/4, pi/2, 2*pi/3, pi/6]
+
+def get_incorr_phis():
+    all_incorr_phis = []
+
+    print(all_incorr_phis)
+    return all_incorr_phis
+
+
+'''
 incorr_phis = [[pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 - err],
              [pi/8 + err, pi/6 + err, 3*pi/8 - err, pi/4 + err], [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 + err], 
              [pi/8 - err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 - err],
@@ -31,7 +40,7 @@ incorr_phis = [[pi/8 + err, pi/6 + err, 3*pi/8 + err, pi/4 + err], [pi/8 + err, 
              [pi/8 + err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 + err],
              [pi/8 + err, pi/6 - err, 3*pi/8 - err, pi/4 - err], [pi/8 - err, pi/6 + err, 3*pi/8 - err, pi/4 - err],
              [pi/8 - err, pi/6 - err, 3*pi/8 + err, pi/4 - err], [pi/8 - err, pi/6 - err, 3*pi/8 - err, pi/4 + err]]
-
+'''
 
 def getABCt(incorr_phi):
     A, B, C, t = [], [], [], []
@@ -75,15 +84,14 @@ def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    allt = []
+    incorr_phis = get_incorr_phis()
+    all_lenghts = []
     for incorr_phi in incorr_phis:
         x,y,z,d = newtonmult(x0, 0.1, incorr_phi)
         print('The error is:')
         print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-        if sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)) in allt:
-            print('Sama\n\n\n')
-        allt.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-    print(allt)
+        all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    print(all_lenghts)
     
 main()
 
