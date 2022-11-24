@@ -3,6 +3,7 @@ from numpy import sin, cos, sqrt, pi, mean, std, linalg as LA
 import matplotlib.pyplot as plt
 import random
 from sympy.utilities.iterables import multiset_permutations
+import json
 
 #constants
 rho = 26570 # kilometers
@@ -13,16 +14,9 @@ Z = 6370
 
 def random_angles(pos: int, sat_amount: int):
     '''Generates {pos} random positions for {sat_amount} satellites each'''
-    rand_phis = []
-    rand_thetas = []
-    for i in range(0, pos):
-        rand_phi = []
-        rand_theta = []
-        for j in range(0, sat_amount):
-            rand_phi.append(random.uniform(0.0, pi/2))
-            rand_theta.append(random.uniform(0.0, 2*pi))
-        rand_thetas.append(rand_theta)
-        rand_phis.append(rand_phi)
+    with open('random_angles.json') as f:
+        all_angles = json.load(f)
+    rand_thetas, rand_phis = all_angles[0], all_angles[1]
     return rand_thetas, rand_phis
 
 def location(phi: float, theta: float):

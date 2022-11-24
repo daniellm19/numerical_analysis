@@ -14,6 +14,7 @@ Z = 6370
 err = 1e-8
 
 def random_angles(pos: int, sat_amount: int):
+    '''Reads the random angles from random_angles.json'''
     with open('random_angles.json') as f:
         all_angles = json.load(f)
     rand_thetas, rand_phis = all_angles[0], all_angles[1]
