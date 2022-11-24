@@ -22,19 +22,26 @@ def location(phi, theta):
 #Problem 3 starts here:
 
 #Constants
-tol_error = 1e-5
-error = 1e-5
-tight_phi = [pi/8-error-error, pi/8-error, pi/8, pi/8+error]
-tight_theta = [pi/2 - error - error, pi/2 - error, pi/2, pi/2+error]
+tol_error = 1e-6
+tiny_offset = 1e-8
+small_offset = 1e-2
+
+
+tiny_phi = [pi/8-tiny_offset-tiny_offset, pi/8-tiny_offset, pi/8+tiny_offset, pi/8+tiny_offset+tiny_offset]
+tiny_theta = [pi/2-tiny_offset-tiny_offset, pi/2-tiny_offset, pi/2+tiny_offset, pi/2+tiny_offset+tiny_offset]
+
+small_phi = [pi/8-small_offset-small_offset, pi/8-small_offset, pi/8+small_offset, pi/8+small_offset+small_offset]
+small_theta = [pi/2-small_offset-small_offset, pi/2-small_offset, pi/2+small_offset, pi/2+small_offset+small_offset]
 
 A, B, C, t = [], [], [], []
-
-for i in range(len(tight_phi)):
-    t.append(location(tight_phi[i], tight_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
-    values = location(tight_phi[i], tight_theta[i]) #Derived from prerceived values
-    A.append(values['A']) #Vector of distances in plane A[km]
-    B.append(values['B']) #Vector of distances in plane B[km]
-    C.append(values['C']) #Vector of distances in plane C[km]
+def populate_matrix(phi, theta):
+    A.clear(), B.clear(), C.clear(), t.clear()
+    for i in range(len(phi)):
+        t.append(location(phi[i], theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
+        values = location(phi[i], theta[i]) #Derived from prerceived values
+        A.append(values['A']) #Vector of distances in plane A[km]
+        B.append(values['B']) #Vector of distances in plane B[km]
+        C.append(values['C']) #Vector of distances in plane C[km]
 
 def F(x):
     funcs = []
@@ -67,8 +74,16 @@ def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
+    populate_matrix(tiny_phi, tiny_theta)
     x,y,z,d = newtonmult(x0, tol_error)
-    print("Final answers: \n")
+    print(f"\nposition with e = {tiny_offset}: \n")
+    print("x is {:.16f} \t".format(x))
+    print("y is {:.16f} \t".format(y))
+    print("z is {:.16f} \t".format(z))
+    print("d is {:.16f} \n".format(d))
+    populate_matrix(small_phi, small_theta)
+    x,y,z,d = newtonmult(x0, tol_error)
+    print(f"\nposition with e = {small_offset}: \n")
     print("x is {:.16f} \t".format(x))
     print("y is {:.16f} \t".format(y))
     print("z is {:.16f} \t".format(z))

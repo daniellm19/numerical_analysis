@@ -52,9 +52,9 @@ def main():
     x0 = np.array([X,Y,Z,D]) #Initial guess for newtons method
     x,y,z,d = newtonmult(x0, toll_err)
     print("Final answers: \n")
-    print("x is {:.6f} \t".format(x))
-    print("y is {:.6f} \t".format(y))
-    print("z is {:.6f} \t".format(z))
-    print("d is {:.6f} \n".format(d))
+    print("x is {:.4f} \t".format(x))
+    print("y is {:.4f} \t".format(y))
+    print("z is {:.2f} \t".format(z))
+    print("d is {:.8f} \n".format(d))
     return 0 
 main()
