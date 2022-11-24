@@ -22,8 +22,8 @@ def location(phi, theta):
 #Problem 3 starts here:
 
 #Constants
-tol_error = 1e-6
-error = 1e-6
+tol_error = 1e-5
+error = 1e-5
 tight_phi = [pi/8-error-error, pi/8-error, pi/8, pi/8+error]
 tight_theta = [pi/2 - error - error, pi/2 - error, pi/2, pi/2+error]
 
