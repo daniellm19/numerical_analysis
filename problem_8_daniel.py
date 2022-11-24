@@ -3,13 +3,14 @@ from numpy import sin, cos, sqrt, pi, mean, std, linalg as LA
 import matplotlib.pyplot as plt
 import random
 from sympy.utilities.iterables import multiset_permutations
+from operator import xor
 
 # Constants
 RHO = 26570                 # distance of satellites from earth[km]
 LIGHT_SPEED = 299792.458    # speed of light [km/s]
 X_0 = np.array([0,0,6370,0])          # Initial x, y, z, and d (time from sat to recv) values
 
-def random_angles(pos: int, rows: int) -> float: #TODO indicate two float value return types
+def random_sat_angles(pos: int, rows: int):
     '''
     Generates {pos} random positions for {rows} amount of satellites each
     
@@ -30,7 +31,7 @@ def random_angles(pos: int, rows: int) -> float: #TODO indicate two float value 
         rand_phis.append(rand_phi)
     return rand_thetas, rand_phis
 
-def location(phi: float, theta: float) -> dict:
+def cartesian_calc(phi: float, theta: float) -> dict:
     """
     Calculates the cartesian coordinates of the satellites along with the time it takes
     to reach the satellite from the inital position of the receiver
@@ -40,9 +41,9 @@ def location(phi: float, theta: float) -> dict:
     phi : The altitude of the satellite (between 0 and pi/2 for simplification)
     theta : The polar angle of the satellite (between 0 and 2*pi)
     """
-    if (phi>(np.pi()/2)) or (0>phi):
+    if (phi>(np.pi/2)) or (0>phi):
         raise ValueError("Phi (the altitude) should be between 0 and pi/2")
-    if (theta>(2*np.pi())) or (0>theta):
+    if (theta>(2*np.pi)) or (0>theta):
         raise ValueError("Theta (the polar angle) should be between 0 and 2*pi")
 
     A = RHO * sin(phi) * cos(theta) if abs(RHO * sin(phi) * cos(theta)) > 1e-10 else 0
@@ -79,7 +80,7 @@ def get_incorr_angle(err: int, angles: list) -> list:
 
     return all_perms
 
-def calculate_cartesian(theta: list, phi: list) -> float: #TODO indicate four float value return types
+def calculate_cartesian(theta: float, phi: float) -> float: #TODO indicate four float value return types
     """
     Gets the cartesian values and the distance from the angles (altitude and azimuth/polar) from
     the satellites
@@ -94,7 +95,7 @@ def calculate_cartesian(theta: list, phi: list) -> float: #TODO indicate four fl
 
     A, B, C, t = [], [], [], []
     for i in range(len(phi)):
-        values = location(phi[i], theta[i])     #Derived from prerceived values
+        values = cartesian_calc(phi[i], theta[i])     #Derived from prerceived values
         A.append(values['A'])                        #Vector of distances in plane A[km]
         B.append(values['B'])                        #Vector of distances in plane B[km]
         C.append(values['C'])                        #Vector of distances in plane C[km]
@@ -194,8 +195,20 @@ def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amoun
     Takes a list of angle coordinates of satellites and adds errors to those coordinates,
     then it calculates the error (using either Newton or Newton-Gauss) and returns 
     the maximum error found
+
+    Arguments
+    ----------
+    thetas : The altitude angles
+    phis: The azimuth/polar angles
+    err : The error you want to add to the satellites
+    tol_err : The tolerance error for either the Newton or Newton-Gauss method
+    sat_amount : The amount of satellites
+    method_type: Specifies either the Newton method ("G") or the Newton-Gauss method ("NG")
+    t : The time it takes to travel from the satellite to the receiver (at light speed)
+    rows : The amount of rows (satellites)
     '''
-    if (method_type!="NG") or (method_type!="N"):
+
+    if (method_type!="NG") and (method_type!="N"):
         raise ValueError("method_type should be either 'NG' (for Newton-Gauss) or 'N' (for Newton)")
 
     incorr_phis = get_incorr_angle(err, phis)
@@ -219,7 +232,7 @@ def main():
     for sat_amount in range(min_sat_amount, sat_amount+1):
         all_errors = []
 
-        rand_thetas, rand_phis = random_angles(sat_pos_amount, sat_amount)
+        rand_thetas, rand_phis = random_sat_angles(sat_pos_amount, sat_amount)
         for i in range(len(rand_phis)):
             max_error = distance_w_error(rand_thetas[i], rand_phis[i], 1e-8, 1e-8, sat_amount, method_type="NG")
             all_errors.append(max_error)
