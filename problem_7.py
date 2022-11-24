@@ -13,7 +13,7 @@ Y = 0
 Z = 6370
 
 def random_angles(pos: int, sat_amount: int):
-    '''Generates {pos} random positions for {sat_amount} satellites each'''
+    '''Reads the random angles from random_angles.json'''
     with open('random_angles.json') as f:
         all_angles = json.load(f)
     rand_thetas, rand_phis = all_angles[0], all_angles[1]
@@ -30,7 +30,8 @@ def location(phi: float, theta: float):
     return ret_dict
 
 def get_incorr_phis(err: int, a_list: list):
-    """Takes in a error and the list of values to add the combinations of errors to"""
+    """Takes in a error and the list of values to add the combinations of errors to.
+    Used for testing how positional errors affect the accuracy of the satellites"""
     all_err_perm = []
     err_list = [err] * len(a_list)
     for i in range(0,len(err_list)+1):
@@ -46,14 +47,14 @@ def get_incorr_phis(err: int, a_list: list):
 
     return all_perms
 
-def getABCt(corr_theta: list, corr_phi: list, incorr_phi: list):
+def getabct(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
-        t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
-        values = location(incorr_phi[i], corr_theta[i]) #Derived from prerceived values
-        A.append(values['A']) #Vector of distances in plane A[km]
-        B.append(values['B']) #Vector of distances in plane B[km]
-        C.append(values['C']) #Vector of distances in plane C[km]
+        t.append(location(corr_phi[i], corr_theta[i])['t']) # Vector of time for each sat t[s] derived from correct values
+        values = location(incorr_phi[i], corr_theta[i])     # Derived from perceived values
+        A.append(values['A'])                               # Vector of distances in plane A[km]
+        B.append(values['B'])                               # Vector of distances in plane B[km]
+        C.append(values['C'])                               # Vector of distances in plane C[km]
     return A, B, C, t
 
 def F(x: list, A: list, B: list, C: list, t: list):
@@ -76,7 +77,7 @@ def newtonmult(x0: list , tol: int, theta: list, phi: list, incorr_phi: list):
     gert ráð fyrir að F(x) og Jacobi fylki DF(x) séu skilgreind annars staðar'''
     x=x0
     oldx=x+2*tol
-    A, B, C, t = getABCt(theta, phi, incorr_phi)
+    A, B, C, t = getabct(theta, phi, incorr_phi)
     while LA.norm(x-oldx, np.inf)>tol:
         oldx=x
         s=-LA.solve(DF(x, A, B, C, t), F(x, A, B, C, t))
@@ -94,42 +95,47 @@ def distance_w_error(theta: list, phi: list, err: float):
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return max(all_lenghts)
 
-def bisection(a: float, b: float, tol: float, theta: list, phi: list):
+def distance_w_max_error(theta: list, phi: list, err: float, allowed_error):
+    return distance_w_error(theta, phi, err) - allowed_error
+
+
+def bisection(theta, phi, a, b, tol, allowed_error):
     '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
     def f(x):
         return(x**2-2)
     '''
-    #print(distance_w_error(theta, phi, a))
-    if distance_w_error(theta, phi, a) * distance_w_error(theta, phi, b) >= 0:
+    if distance_w_max_error(theta, phi, a, allowed_error)*distance_w_max_error(theta, phi, b, allowed_error) >= 0:
         print("Bisection method fails.")
         return None
     else:
-        fa=distance_w_error(theta, phi, a)
+        fa=distance_w_max_error(theta, phi, a, allowed_error)
         while (b-a)/2>tol:
             c=(a+b)/2
-            fc=distance_w_error(theta, phi, c)
+            fc=distance_w_max_error(theta, phi, c, allowed_error)
             if fc==0:break
             if fc*fa<0:
                 b=c
             else:
                 a=c
                 fa=fc
-    #print((a+b)/2)            
+    print((a+b)/2)
     return((a+b)/2)
 
 def main():
-    b = 1e-8
-    a = 0
-    bi_tol = 1e-13
-    rand_thetas, rand_phis = random_angles(100,4)
+    ini_err = 1e-8
     all_errors = []
-    for i in range(len(rand_phis)):
-        max_error = bisection(a, b, bi_tol, rand_thetas[i], rand_phis[i])
-        all_errors.append(max_error)
-    print(all_errors)
-    return all_errors
+    allowed_error = 0.0001
+    rand_thetas, rand_phis = random_angles(100,4)
+    for i in range(0, len(rand_phis)):        
+        all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], ini_err))
+
+    max_value = max(all_errors)
+    most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
+    a = 0
+    b = 1e-8
+    tol = 1e-20
+    bisection(most_error_theta, most_error_phi, a, b, tol, allowed_error)
 
 
 if __name__ == "__main__":
     main()
-
