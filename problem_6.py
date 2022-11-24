@@ -54,7 +54,7 @@ def get_incorr_phis(err: int, a_list: list):
 
     return all_perms
 
-def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
+def getabct(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
         t.append(location(corr_phi[i], corr_theta[i])['t']) # Vector of time for each sat t[s] derived from correct values
