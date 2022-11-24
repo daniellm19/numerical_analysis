@@ -10,7 +10,14 @@ LIGHT_SPEED = 299792.458    # speed of light [km/s]
 X_0 = np.array([0,0,6370,0])          # Initial x, y, z, and d (time from sat to recv) values
 
 def random_angles(pos: int, rows: int):
-    '''Generates {pos} random positions for {rows} amount of satellites each'''
+    '''
+    Generates {pos} random positions for {rows} amount of satellites each
+    
+    Attributes
+    ----------
+    pos : The number of random positions to calculate for the satellites
+    rows : The amount of satellites that become rows in f(x) and df(x) (Jacobi)
+    '''
     rand_phis = []
     rand_thetas = []
     for _ in range(0, pos):
