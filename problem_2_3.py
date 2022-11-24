@@ -63,13 +63,12 @@ def main():
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    x,y,z,d = newtonmult(x0, 0.00001
+    x,y,z,d = newtonmult(x0, 0.00001)
     print(f"Values: x = {x} ,  y = {y} , z = {z} , d =  {d}")
     print('The error is: ', end="")
-    print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    print(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)), 'km')
     return 0
     
-main()
 
 if __name__ == "__main__":
-    print(main)
+    main()
