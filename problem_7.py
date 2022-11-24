@@ -105,14 +105,13 @@ def bisection(a: float, b: float, tol: float, theta: list, phi: list):
     def f(x):
         return(x**2-2)
     '''
-    print(distance_w_error(theta, phi, a))
+    #print(distance_w_error(theta, phi, a))
     if 0.0001 - distance_w_error(theta, phi, a) * distance_w_error(theta, phi, b) >= 0:
-        print("Bisection method fails.")
+        #print("Bisection method fails.")
         return None
     else:
         fa=distance_w_error(theta, phi, a)
         while (b-a)/2>tol:
-            print(a)
             c=(a+b)/2
             fc=distance_w_error(theta, phi, c)
             if fc==0:break
@@ -125,16 +124,16 @@ def bisection(a: float, b: float, tol: float, theta: list, phi: list):
     return((a+b)/2)
 
 def main():
-    b = 1e-8
-    a = 1e-10
-    bi_tol = 1e-9
+    b = 1
+    a = 0
+    bi_tol = 1e-11
     rand_thetas, rand_phis = random_angles(100,4)
     all_errors = []
     for i in range(len(rand_phis)):
         max_error = bisection(a, b, bi_tol, rand_thetas[i], rand_phis[i])
         all_errors.append(max_error)
     print(all_errors)
-    return max_error
+    return max(all_errors)
 
 if __name__ == "__main__":
     main()
