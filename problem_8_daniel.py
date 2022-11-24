@@ -103,15 +103,15 @@ def newton_gauss_mult(x0: list, tol: int, theta: list, phi: list, incorr_phi: li
     return(x)
 
 def distance_w_error(theta: list, phi: list, err: int, tol_err: int, sat_amount: int):
-    '''Runs the program and gives stores the intitial guess
-    And prints the solution in an acceptable way'''
+    '''Takes a list of angle coordinates of satellites and adds errors to those coordinates,
+    then it calculates the error and returns the maximum error found'''
 
     incorr_phis = get_incorr_phis(err, phi)
-    all_lenghts = []
+    all_errors = []
     for incorr_phi in incorr_phis:
         x,y,z,_ = newton_gauss_mult(X_0, tol_err, theta, phi, incorr_phi, sat_amount)
-        all_lenghts.append(sqrt(pow(x - X_0[0], 2) + pow(y - X_0[1], 2) + pow(z - X_0[2], 2)))
-    return all_lenghts
+        all_errors.append(sqrt(pow(x - X_0[0], 2) + pow(y - X_0[1], 2) + pow(z - X_0[2], 2)))
+    return max(all_errors)
 
 def main():
     sat_pos_amount = 100 
@@ -124,7 +124,7 @@ def main():
 
         rand_thetas, rand_phis = random_angles(sat_pos_amount, sat_amount)
         for i in range(len(rand_phis)):
-            max_error = max(distance_w_error(rand_thetas[i], rand_phis[i], 1e-8, 1e-8, sat_amount))
+            max_error = distance_w_error(rand_thetas[i], rand_phis[i], 1e-8, 1e-8, sat_amount)
             all_errors.append(max_error)
 
         max_error = max(all_errors)
