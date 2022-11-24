@@ -37,7 +37,8 @@ def location(phi: float, theta: float):
     return ret_dict
 
 def get_incorr_phis(err: int, a_list: list):
-    """Takes in a error and the list of values to add the combinations of errors to"""
+    """Takes in a error and the list of values to add the combinations of errors to.
+    Used for testing how positional errors affect the accuracy of the satellites"""
     all_err_perm = []
     err_list = [err] * len(a_list)
     for i in range(0,len(err_list)+1):
@@ -53,14 +54,14 @@ def get_incorr_phis(err: int, a_list: list):
 
     return all_perms
 
-def getABCt(corr_theta: list, corr_phi: list, incorr_phi: list):
+def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
-        t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
-        values = location(incorr_phi[i], corr_theta[i]) #Derived from prerceived values
-        A.append(values['A']) #Vector of distances in plane A[km]
-        B.append(values['B']) #Vector of distances in plane B[km]
-        C.append(values['C']) #Vector of distances in plane C[km]
+        t.append(location(corr_phi[i], corr_theta[i])['t']) # Vector of time for each sat t[s] derived from correct values
+        values = location(incorr_phi[i], corr_theta[i])     # Derived from perceived values
+        A.append(values['A'])                               # Vector of distances in plane A[km]
+        B.append(values['B'])                               # Vector of distances in plane B[km]
+        C.append(values['C'])                               # Vector of distances in plane C[km]
     return A, B, C, t
 
 def F(x: list, A: list, B: list, C: list, t: list):
@@ -83,7 +84,7 @@ def newtonmult(x0: list , tol: int, theta: list, phi: list, incorr_phi: list):
     gert ráð fyrir að F(x) og Jacobi fylki DF(x) séu skilgreind annars staðar'''
     x=x0
     oldx=x+2*tol
-    A, B, C, t = getABCt(theta, phi, incorr_phi)
+    A, B, C, t = getabct(theta, phi, incorr_phi)
     while LA.norm(x-oldx, np.inf)>tol:
         oldx=x
         s=-LA.solve(DF(x, A, B, C, t), F(x, A, B, C, t))
