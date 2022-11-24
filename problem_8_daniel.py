@@ -190,7 +190,7 @@ def newton_gauss_mult(x0: list, tol: int, A: list, B: list, C: list, t: list, ro
         x = x+s
     return(x)
 
-def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amount: int, method_type: str = "NG") -> float:
+def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amount: int, method_type: str = "Newton-Gauss") -> float:
     '''
     Takes a list of angle coordinates of satellites and adds errors to those coordinates,
     then it calculates the error (using either Newton or Newton-Gauss) and returns 
@@ -203,12 +203,10 @@ def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amoun
     err : The error you want to add to the satellites
     tol_err : The tolerance error for either the Newton or Newton-Gauss method
     sat_amount : The amount of satellites
-    method_type: Specifies either the Newton method ("G") or the Newton-Gauss method ("NG")
-    t : The time it takes to travel from the satellite to the receiver (at light speed)
-    rows : The amount of rows (satellites)
+    method_type: Specifies either the Newton method ("Newton") or the Newton-Gauss method ("Newton-Gauss")
     '''
 
-    if (method_type!="NG") and (method_type!="N"):
+    if (method_type!="Newton-Gauss") and (method_type!="Newton"):
         raise ValueError("method_type should be either 'NG' (for Newton-Gauss) or 'N' (for Newton)")
 
     incorr_phis = get_incorr_angle(err, phis)
@@ -216,17 +214,18 @@ def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amoun
     for incorr_phi in incorr_phis:
         A, B, C, _ = calculate_cartesian(thetas, incorr_phi)
         _, _, _, t = calculate_cartesian(thetas, phis)
-        if method_type=="NG":
+        if method_type=="Newton-Gauss":
             x,y,z,_ = newton_gauss_mult(X_0, tol_err, A, B, C, t, sat_amount)
-        elif method_type=="N":
+        elif method_type=="Newton":
             x,y,z,_ = newton_mult(X_0, tol_err, A, B, C, t, sat_amount)
         all_errors.append(sqrt(pow(x - X_0[0], 2) + pow(y - X_0[1], 2) + pow(z - X_0[2], 2)))
     return max(all_errors)
 
-def main():
+if __name__ == "__main__":
     sat_pos_amount = 100 
     min_sat_amount = 5
     sat_amount = 9
+    method_type = "Newton-Gauss"
     all_all_errors = []
 
     for sat_amount in range(min_sat_amount, sat_amount+1):
@@ -234,22 +233,16 @@ def main():
 
         rand_thetas, rand_phis = random_sat_angles(sat_pos_amount, sat_amount)
         for i in range(len(rand_phis)):
-            max_error = distance_w_error(rand_thetas[i], rand_phis[i], 1e-8, 1e-8, sat_amount, method_type="NG")
+            max_error = distance_w_error(rand_thetas[i], rand_phis[i], 1e-8, 1e-8, sat_amount, method_type)
             all_errors.append(max_error)
 
-        max_error = max(all_errors)
-        min_error = min(all_errors)
-        mean_error = mean(all_errors)
-        print('Max error in distance:', max_error)
-        print('Min error in distance:', min_error)
-        print('Mean error in distance:', mean_error)
-        print(f'Standard deviation: {std(all_errors)}\n')
+        print(f'Done calculating the error for satellite amount {sat_amount} with the {method_type} method\n')
 
         fig, ax = plt.subplots()
         ax.set_xlabel('Satellite amount')
         ax.set_ylabel('Error [km]')
-        ax.set_title(f'Error w.r.t {sat_amount} satellites for Newton-Gauss')
-        bp = ax.boxplot(all_errors)  
+        ax.set_title(f'Error w.r.t {sat_amount} satellites for the {method_type} method')
+        bp = ax.boxplot(all_errors, positions=[sat_amount])  
         plt.setp(bp['whiskers'], color='k', linestyle='-')
         plt.setp(bp['fliers'], markersize=3.0)
         fig.savefig(f'figures/sat_num_{sat_amount}.png')
@@ -261,7 +254,7 @@ def main():
     fig, ax = plt.subplots()
     ax.set_xlabel('Satellite amount')
     ax.set_ylabel('Error [km]')
-    ax.set_title('Error w.r.t the amount of satellites for Newton-Gauss')
+    ax.set_title('Error w.r.t the amount of satellites for the {method_type} method')
     bp = ax.boxplot(all_all_errors, positions=[i for i in range(6, sat_amount+1)])  
     plt.setp(bp['whiskers'], color='k', linestyle='-')
     plt.setp(bp['fliers'], markersize=3.0)
@@ -278,5 +271,3 @@ def main():
     plt.xticks(np.arange(6, sat_amount+1, 1))
     plt.savefig('figures/diff_errors')
     plt.show()
-
-main()
