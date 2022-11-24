@@ -54,10 +54,10 @@ def getabct(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
         t.append(location(corr_phi[i], corr_theta[i])['t']) #Vector of time for each sat t[s] derived from correct values
-        values = location(incorr_phi[i], corr_theta[i]) #Derived from prerceived values
-        A.append(values['A']) #Vector of distances in plane A[km]
-        B.append(values['B']) #Vector of distances in plane B[km]
-        C.append(values['C']) #Vector of distances in plane C[km]
+        values = location(incorr_phi[i], corr_theta[i])     #Derived from prerceived values
+        A.append(values['A'])                               #Vector of distances in plane A[km]
+        B.append(values['B'])                               #Vector of distances in plane B[km]
+        C.append(values['C'])                               #Vector of distances in plane C[km]
     return A, B, C, t
 
 def f(x: list, A: list, B: list, C: list, t: list, rows: int):
@@ -166,6 +166,7 @@ def main():
     plt.title("Different errors w.r.t. satellite amount with Newton-Gauss")
     plt.legend(loc='best')
     plt.xticks(np.arange(6, sat_amount+1, 1))
+    plt.savefig('figures/diff_errors')
     plt.show()
 
 main()

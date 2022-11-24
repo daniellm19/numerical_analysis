@@ -1,0 +1,26 @@
+@startuml
+skinparam classAttributeIconSize 0
+class Satellite {
+ A_init: float
+ B_init: float
+ C_init: float
+ t_init: float
+ altitude_init: float
+ polar_angle_init: float
+ calculate_path(direction)
+}
+
+class Positioning {
+ {static} -sat_num: int
+ -init_pos: list
+ +create_sat(A_init,B_init,C_init,t_init)
+ +find_intersect(tol_err)
+ +create_all_possible_errors(error, list_of_angles)
+ +create_rand_pos_of_sat(amount)
+ -newton_mult(tol_err)
+ -newton_gauss_mult(tol_err)
+}
+
+Positioning --> Satellite
+
+@enduml
