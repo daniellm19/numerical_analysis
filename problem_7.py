@@ -119,14 +119,14 @@ def bisection(a: float, b: float, tol: float, theta: list, phi: list):
                 b=c
             else:
                 a=c
-                fa=fc
+                fa=fcz
     print((a+b)/2)            
     return((a+b)/2)
 
 def main():
     b = 1
     a = 0
-    bi_tol = 1e-11
+    bi_tol = 1e-2
     rand_thetas, rand_phis = random_angles(100,4)
     all_errors = []
     for i in range(len(rand_phis)):

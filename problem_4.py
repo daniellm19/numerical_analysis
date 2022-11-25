@@ -88,8 +88,9 @@ def main():
     incorr_phis = get_incorr_phis(err, corr_phi)
     all_lenghts = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 10e-9, incorr_phi)
+        x,y,z,_ = newtonmult(x0, 10e-9, incorr_phi)
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    print(all_lenghts)
     print('The maximum error is:', max(all_lenghts))
     
 

@@ -23,8 +23,8 @@ def location(phi, theta):
 
 #Constants
 tol_error = 1e-6
-tiny_offset = 1e-8
-small_offset = 1e-2
+tiny_offset = 1e-5
+small_offset = 0.01
 
 
 tiny_phi = [pi/8-tiny_offset-tiny_offset, pi/8-tiny_offset, pi/8+tiny_offset, pi/8+tiny_offset+tiny_offset]
