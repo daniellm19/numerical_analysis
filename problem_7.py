@@ -124,7 +124,7 @@ def bisection(theta, phi, a, b, tol, allowed_error):
 def main():
     ini_err = 1e-8
     all_errors = []
-    allowed_error = 0.0001
+    allowed_error = 0.0001 #10cm
     rand_thetas, rand_phis = random_angles(100,4)
     for i in range(0, len(rand_phis)):        
         all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], ini_err))
@@ -133,7 +133,7 @@ def main():
     most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
     a = 0
     b = 1e-8
-    tol = 1e-20
+    tol = 1e-14
     bisection(most_error_theta, most_error_phi, a, b, tol, allowed_error)
 
 
