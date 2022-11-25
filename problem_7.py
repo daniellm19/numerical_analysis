@@ -133,7 +133,7 @@ def main():
     most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
     a = 0
     b = 1e-8
-    tol = 1e-14
+    tol = 1e-16
     bisection(most_error_theta, most_error_phi, a, b, tol, allowed_error)
 
 
