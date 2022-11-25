@@ -106,8 +106,14 @@ def main():
     print('Min error in distance:', min(all_errors))
     print('Average:', mean(all_errors))
     print('Standard deviation:', std(all_errors))
+    plt.clf()
     fig = plt.figure(figsize =(10, 7))    
-    plt.boxplot(all_errors)  
+    plt.boxplot(all_errors) 
+    plt.ylabel('Perceived error [km]') 
+    plt.show()
+    plt.hist(all_errors)
+    plt.xlabel('Perceived error [km]')
+    plt.ylabel('No. of sattelite groups')
     plt.show()
 
 import time
