@@ -95,11 +95,11 @@ def distance_w_error(theta: list, phi: list, err: float):
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return max(all_lenghts)
 
-def distance_w_max_error(theta: list, phi: list, err: float, allowed_error):
+def distance_w_max_error(theta: list, phi: list, err: float, allowed_error: float):
     return distance_w_error(theta, phi, err) - allowed_error
 
 
-def bisection(theta, phi, a, b, tol, allowed_error):
+def bisection(theta: list, phi: list, a: float, b: float, tol: float, allowed_error: float):
     '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
     def f(x):
         return(x**2-2)
