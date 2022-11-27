@@ -11,7 +11,6 @@ c = 299792.458 # speed of light [km/s]
 X = 0
 Y = 0
 Z = 6370
-err = 1e-8
 
 def random_angles(pos: int, sat_amount: int):
     '''Reads the random angles from random_angles.json'''
@@ -48,7 +47,7 @@ def get_incorr_phis(err: int, a_list: list):
 
     return all_perms
 
-def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
+def getabct(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
         t.append(location(corr_phi[i], corr_theta[i])['t']) # Vector of time for each sat t[s] derived from correct values
@@ -59,13 +58,13 @@ def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
     return A, B, C, t
 
 def F(x: list, A: list, B: list, C: list, t: list):
-    eqs = []
+    funcs = []
     for i in range(4):
-        eqs.append(pow((x[0]-A[i]), 2) + pow((x[1]-B[i]),2) + pow((x[2]-C[i]),2) - pow(c,2) * pow((t[i]-x[3]), 2))
-    return eqs
+        funcs.append(pow((x[0]-A[i]), 2) + pow((x[1]-B[i]),2) + pow((x[2]-C[i]),2) - pow(c,2) * pow((t[i]-x[3]), 2))
+    return funcs
 
 def DF(x: list, A: list, B: list, C: list, t: list):
-    '''Creates each row of Jacobi matrix independently (Hard coded) takes in a 4x1 vector
+    '''Creates each row of jacobi matrix independently(Hard coded) takes in a 4x1 vector
     of initial conditions and creates a matrix which is returned'''
     eq_list = [0,0,0,0]
     for i in range(0, len(eq_list)):
@@ -85,7 +84,7 @@ def newtonmult(x0: list , tol: int, theta: list, phi: list, incorr_phi: list):
         x=x+s
     return(x)
 
-def distance_w_error(theta: list, phi: list):
+def distance_w_error(theta: list, phi: list, err: float):
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
@@ -94,31 +93,49 @@ def distance_w_error(theta: list, phi: list):
     for incorr_phi in incorr_phis:
         x,y,z,d = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-    return all_lenghts
+    return max(all_lenghts)
+
+def distance_w_max_error(theta: list, phi: list, err: float, allowed_error):
+    return distance_w_error(theta, phi, err) - allowed_error
+
+
+def bisection(theta, phi, a, b, tol, allowed_error):
+    '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
+    def f(x):
+        return(x**2-2)
+    '''
+    if distance_w_max_error(theta, phi, a, allowed_error)*distance_w_max_error(theta, phi, b, allowed_error) >= 0:
+        print("Bisection method fails.")
+        return None
+    else:
+        fa=distance_w_max_error(theta, phi, a, allowed_error)
+        while (b-a)/2>tol:
+            c=(a+b)/2
+            fc=distance_w_max_error(theta, phi, c, allowed_error)
+            if fc==0:break
+            if fc*fa<0:
+                b=c
+            else:
+                a=c
+                fa=fc
+    print((a+b)/2)
+    return((a+b)/2)
 
 def main():
+    ini_err = 1e-8
     all_errors = []
+    allowed_error = 0.0001
     rand_thetas, rand_phis = random_angles(100,4)
-    for i in range(len(rand_phis)):
-        max_error = max(distance_w_error(rand_thetas[i], rand_phis[i]))
-        all_errors.append(max_error)
-    print('Max error in distance:', max(all_errors))
-    print('Min error in distance:', min(all_errors))
-    print('Average:', mean(all_errors))
-    print('Standard deviation:', std(all_errors))
-    plt.clf()
-    fig = plt.figure(figsize =(10, 7))    
-    plt.boxplot(all_errors) 
-    plt.ylabel('Perceived error [km]') 
-    plt.show()
-    plt.hist(all_errors)
-    plt.xlabel('Perceived error [km]')
-    plt.ylabel('No. of sattelite groups')
-    plt.show()
+    for i in range(0, len(rand_phis)):        
+        all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], ini_err))
 
-import time
+    max_value = max(all_errors)
+    most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
+    a = 0
+    b = 1e-8
+    tol = 1e-20
+    bisection(most_error_theta, most_error_phi, a, b, tol, allowed_error)
+
+
 if __name__ == "__main__":
     main()
-
-
-

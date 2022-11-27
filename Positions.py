@@ -353,7 +353,7 @@ class Positions:
         ----------
         a : Lower bound on the error
         b : Upper bound on the error
-        t : The time it takes to travel from the satellite to the receiver (at light speed)
+        theta : The angles 
         """
 
         if 0.0001 - self.distance_w_error(theta, phi, a) * self.distance_w_error(theta, phi, b) >= 0:
@@ -371,7 +371,7 @@ class Positions:
                     fa=fc          
         return((a+b)/2)
 
-    def distance_w_error(self, thetas: list, phis: list, err: int, tol_err: int, sat_amount: int, method_type: str = "Newton-Gauss") -> float:
+    def distance_w_error(self, thetas: list, phis: list, incorr_phis: list, method_type: str = "Newton-Gauss") -> float:
         '''
         Takes a list of angle coordinates of satellites and adds errors to those coordinates,
         then it calculates the error (using either Newton or Newton-Gauss) and returns 
@@ -393,7 +393,6 @@ class Positions:
         old_sat_amount = self.sat_amount
         self.sat_amount = sat_amount
 
-        incorr_phis = self.get_incorr_angle(err, phis)
         all_errors = []
         for incorr_phi in incorr_phis:
             A, B, C, _ = self.calculate_multiple_cartesian(thetas, incorr_phi)
@@ -406,6 +405,33 @@ class Positions:
         
         self.sat_amount = old_sat_amount             # Resets the satellite amount since none are created
         return max(all_errors)
+
+    def distance_w_max_error(self, theta: list, phi: list, incorr_phis: list, allowed_error: float, method_type: str = "Newton-Gauss"):
+        return self.distance_w_error(theta, phi, incorr_phis) - allowed_error
+
+    def bisection_error(self, theta: list, phi: list, a: float, b: float, tol: float, allowed_error: float, method_type: str = "Newton-Gauss"):
+        '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
+        def f(x):
+            return(x**2-2)
+        '''
+        a_incorr_phis = self.get_incorr_phis(a, phi)
+        b_incorr_phis = self.get_incorr_phis(b, phi)
+        if self.distance_w_max_error(theta, phi, a_incorr_phis, allowed_error)*self.distance_w_max_error(theta, phi, b_incorr_phis, allowed_error) >= 0:
+            print("Bisection method failed.")
+            return None
+        else:
+            fa=self.distance_w_max_error(theta, phi, a_incorr_phis, allowed_error)
+            while (b-a)/2>tol:
+                c=(a+b)/2
+                c_incorr_phis = self.get_incorr_phis(c, phi)
+                fc=self.distance_w_max_error(theta, phi, c_incorr_phis, allowed_error)
+                if fc==0:break
+                if fc*fa<0:
+                    b=c
+                else:
+                    a=c
+                    fa=fc
+        return((a+b)/2)
 
 if __name__ == "__main__":
     sat_pos_amount = 100 
