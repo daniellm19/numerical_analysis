@@ -96,22 +96,37 @@ def distance_w_error(theta: list, phi: list):
         all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
     return all_lenghts
 
+def errors_no_outliers(a_list):
+    pass
+    no = []
+    for err in a_list:
+        if err < 0.00225:
+            no.append(err)
+    print(len(no))
+    return no
+
 def main():
     all_errors = []
     rand_thetas, rand_phis = random_angles(100,4)
     for i in range(len(rand_phis)):
         max_error = max(distance_w_error(rand_thetas[i], rand_phis[i]))
         all_errors.append(max_error)
+    print(all_errors)
     print('Max error in distance:', max(all_errors))
     print('Min error in distance:', min(all_errors))
     print('Average:', mean(all_errors))
     print('Standard deviation:', std(all_errors))
+    no_outliers = errors_no_outliers(all_errors)
     plt.clf()
     fig = plt.figure(figsize =(10, 7))    
     plt.boxplot(all_errors) 
     plt.ylabel('Perceived error [km]') 
     plt.show()
     plt.hist(all_errors)
+    plt.xlabel('Perceived error [km]')
+    plt.ylabel('No. of sattelite groups')
+    plt.show()
+    plt.hist(no_outliers)
     plt.xlabel('Perceived error [km]')
     plt.ylabel('No. of sattelite groups')
     plt.show()
