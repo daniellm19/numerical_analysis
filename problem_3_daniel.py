@@ -6,7 +6,7 @@ if __name__ == "__main__":
     corr_theta = [-np.pi/4, np.pi/2, 2*np.pi/3, np.pi/6]
     incorr_phi = [np.pi/8 + 1e-8, np.pi/6 + 1e-8, 3*np.pi/8 - 1e-8, np.pi/4 - 1e-8]
     
-    pos = Positions(x0=np.array([0,0,6730,0]), toll=1e-8)
+    pos = Positions(np.array([0,0,6730,0]), toll=1e-8)
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
         t = pos.cartesian_calc(corr_phi[i], corr_theta[i])['t'] #Vector of time for each sat t[s] derived from correct values

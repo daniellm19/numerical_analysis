@@ -224,7 +224,7 @@ def distance_w_error(thetas: list, phis: list, err: int, tol_err: int, sat_amoun
 if __name__ == "__main__":
     sat_pos_amount = 100 
     min_sat_amount = 5
-    sat_amount = 9
+    sat_amount = 7
     method_type = "Newton-Gauss"
     all_all_errors = []
 
@@ -246,6 +246,12 @@ if __name__ == "__main__":
         plt.setp(bp['whiskers'], color='k', linestyle='-')
         plt.setp(bp['fliers'], markersize=3.0)
         fig.savefig(f'figures/sat_num_{sat_amount}.png')
+        plt.cla()
+        plt.hist(all_errors)
+        plt.xlabel('Perceived error [km]')
+        plt.ylabel('No. of sattelite groups')
+        plt.title(f'Error w.r.t {sat_amount} satellites for the {method_type} method')
+        plt.show()
 
         if sat_amount <= min_sat_amount:
             continue
