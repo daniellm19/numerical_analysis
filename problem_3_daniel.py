@@ -1,5 +1,7 @@
 import numpy as np 
 from Positions import Positions
+from numpy import sin, cos, sqrt, pi, linalg as LA
+import matplotlib.pyplot as pst
 
 if __name__ == "__main__":
     corr_phi = [pi/8, pi/6, 3*pi/8, pi/4]
