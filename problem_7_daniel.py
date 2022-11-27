@@ -11,7 +11,6 @@ c = 299792.458 # speed of light [km/s]
 X = 0
 Y = 0
 Z = 6370
-err = 1e-8
 
 def random_angles(pos: int, sat_amount: int):
     '''Reads the random angles from random_angles.json'''
@@ -48,7 +47,7 @@ def get_incorr_phis(err: int, a_list: list):
 
     return all_perms
 
-def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
+def getabct(corr_theta: list, corr_phi: list, incorr_phi: list):
     A, B, C, t = [], [], [], []
     for i in range(len(corr_phi)):
         t.append(location(corr_phi[i], corr_theta[i])['t']) # Vector of time for each sat t[s] derived from correct values
@@ -59,13 +58,13 @@ def getacbt(corr_theta: list, corr_phi: list, incorr_phi: list):
     return A, B, C, t
 
 def F(x: list, A: list, B: list, C: list, t: list):
-    eqs = []
+    funcs = []
     for i in range(4):
-        eqs.append(pow((x[0]-A[i]), 2) + pow((x[1]-B[i]),2) + pow((x[2]-C[i]),2) - pow(c,2) * pow((t[i]-x[3]), 2))
-    return eqs
+        funcs.append(pow((x[0]-A[i]), 2) + pow((x[1]-B[i]),2) + pow((x[2]-C[i]),2) - pow(c,2) * pow((t[i]-x[3]), 2))
+    return funcs
 
 def DF(x: list, A: list, B: list, C: list, t: list):
-    '''Creates each row of Jacobi matrix independently (Hard coded) takes in a 4x1 vector
+    '''Creates each row of jacobi matrix independently(Hard coded) takes in a 4x1 vector
     of initial conditions and creates a matrix which is returned'''
     eq_list = [0,0,0,0]
     for i in range(0, len(eq_list)):
@@ -85,55 +84,56 @@ def newtonmult(x0: list , tol: int, theta: list, phi: list, incorr_phi: list):
         x=x+s
     return(x)
 
-def distance_w_error(theta: list, phi: list):
+def distance_w_error(theta: list, phi: list, incorr_phis: list):
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    incorr_phis = get_incorr_phis(err, phi)
-    all_lenghts = []
-    for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
-        all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-    return all_lenghts
 
-def errors_no_outliers(a_list):
-    pass
-    no = []
-    for err in a_list:
-        if err < 0.00225:
-            no.append(err)
-    print(len(no))
-    return no
-
-def main():
     all_errors = []
-    rand_thetas, rand_phis = random_angles(100,4)
-    for i in range(len(rand_phis)):
-        max_error = max(distance_w_error(rand_thetas[i], rand_phis[i]))
-        all_errors.append(max_error)
-    print(all_errors)
-    print('Max error in distance:', max(all_errors))
-    print('Min error in distance:', min(all_errors))
-    print('Average:', mean(all_errors))
-    print('Standard deviation:', std(all_errors))
-    no_outliers = errors_no_outliers(all_errors)
-    plt.clf()
-    fig = plt.figure(figsize =(10, 7))    
-    plt.boxplot(all_errors) 
-    plt.ylabel('Perceived error [km]') 
-    plt.show()
-    plt.hist(all_errors)
-    plt.xlabel('Perceived error [km]')
-    plt.ylabel('No. of sattelite groups')
-    plt.show()
-    plt.hist(no_outliers)
-    plt.xlabel('Perceived error [km]')
-    plt.ylabel('No. of sattelite groups')
-    plt.show()
+    for incorr_phi in incorr_phis:
+        x,y,z,_ = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
+        all_errors.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    return max(all_errors)
 
-import time
+def distance_w_max_error(theta: list, phi: list, incorr_phis: list, allowed_error: float):
+    return distance_w_error(theta, phi, incorr_phis) - allowed_error
+
+def bisection_error(theta: list, phi: list, a: float, b: float, tol: float, allowed_error: float):
+    '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
+    def f(x):
+        return(x**2-2)
+    '''
+    a_incorr_phis = get_incorr_phis(a, phi)
+    b_incorr_phis = get_incorr_phis(b, phi)
+    if distance_w_max_error(theta, phi, a_incorr_phis, allowed_error)*distance_w_max_error(theta, phi, b_incorr_phis, allowed_error) >= 0:
+        print("Bisection method failed.")
+        return None
+    else:
+        fa=distance_w_max_error(theta, phi, get_incorr_phis(a, phi), allowed_error)
+        while (b-a)/2>tol:
+            c=(a+b)/2
+            c_incorr_phis = get_incorr_phis(c, phi)
+            fc=distance_w_max_error(theta, phi, c_incorr_phis, allowed_error)
+            if fc==0:break
+            if fc*fa<0:
+                b=c
+            else:
+                a=c
+                fa=fc
+    return((a+b)/2)
+
 if __name__ == "__main__":
-    main()
+    ini_err = 1e-8
+    all_errors = []
+    allowed_error = 0.0001 #10cm
+    rand_thetas, rand_phis = random_angles(100,4)
+    for i in range(0, len(rand_phis)):        
+        all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], get_incorr_phis(ini_err, rand_phis[i])))
 
-
-
+    max_value = max(all_errors)
+    most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
+    a = 0
+    b = 1e-8
+    tol = 1e-16
+    error = bisection_error(most_error_theta, most_error_phi, a, b, tol, allowed_error)
+    print(error)

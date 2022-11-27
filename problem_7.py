@@ -84,41 +84,43 @@ def newtonmult(x0: list , tol: int, theta: list, phi: list, incorr_phi: list):
         x=x+s
     return(x)
 
-def distance_w_error(theta: list, phi: list, err: float):
+def distance_w_error(theta: list, phi: list, incorr_phis: list):
     '''Runs the program and gives stores the intitial guess
     And prints the solution in an acceptable way'''
     x0 = np.array([0,0,6370,0]) #Initial guess for newtons method
-    incorr_phis = get_incorr_phis(err, phi)
-    all_lenghts = []
+
+    all_errors = []
     for incorr_phi in incorr_phis:
-        x,y,z,d = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
-        all_lenghts.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
-    return max(all_lenghts)
+        x,y,z,_ = newtonmult(x0, 1e-8, theta, phi, incorr_phi)
+        all_errors.append(sqrt(pow(x - X, 2) + pow(y - Y, 2) + pow(z - Z, 2)))
+    return max(all_errors)
 
-def distance_w_max_error(theta: list, phi: list, err: float, allowed_error: float):
-    return distance_w_error(theta, phi, err) - allowed_error
+def distance_w_max_error(theta: list, phi: list, incorr_phis: list, allowed_error: float):
+    return distance_w_error(theta, phi, incorr_phis) - allowed_error
 
 
-def bisection(theta: list, phi: list, a: float, b: float, tol: float, allowed_error: float):
+def bisection_error(theta: list, phi: list, a: float, b: float, tol: float, allowed_error: float):
     '''gert ráð fyrir að búið se að skilgreina f(x) fyrir utan t.d.
     def f(x):
         return(x**2-2)
     '''
-    if distance_w_max_error(theta, phi, a, allowed_error)*distance_w_max_error(theta, phi, b, allowed_error) >= 0:
-        print("Bisection method fails.")
+    a_incorr_phis = get_incorr_phis(a, phi)
+    b_incorr_phis = get_incorr_phis(b, phi)
+    if distance_w_max_error(theta, phi, a_incorr_phis, allowed_error)*distance_w_max_error(theta, phi, b_incorr_phis, allowed_error) >= 0:
+        print("Bisection method failed.")
         return None
     else:
-        fa=distance_w_max_error(theta, phi, a, allowed_error)
+        fa=distance_w_max_error(theta, phi, get_incorr_phis(a, phi), allowed_error)
         while (b-a)/2>tol:
             c=(a+b)/2
-            fc=distance_w_max_error(theta, phi, c, allowed_error)
+            c_incorr_phis = get_incorr_phis(c, phi)
+            fc=distance_w_max_error(theta, phi, c_incorr_phis, allowed_error)
             if fc==0:break
             if fc*fa<0:
                 b=c
             else:
                 a=c
                 fa=fc
-    print((a+b)/2)
     return((a+b)/2)
 
 def main():
@@ -127,15 +129,15 @@ def main():
     allowed_error = 0.0001 #10cm
     rand_thetas, rand_phis = random_angles(100,4)
     for i in range(0, len(rand_phis)):        
-        all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], ini_err))
+        all_errors.append(distance_w_error(rand_thetas[i], rand_phis[i], get_incorr_phis(ini_err, rand_phis[i])))
 
     max_value = max(all_errors)
     most_error_theta, most_error_phi = rand_thetas[all_errors.index(max_value)], rand_phis[all_errors.index(max_value)]
     a = 0
     b = 1e-8
     tol = 1e-16
-    bisection(most_error_theta, most_error_phi, a, b, tol, allowed_error)
-
+    error = bisection_error(most_error_theta, most_error_phi, a, b, tol, allowed_error)
+    print(error)
 
 if __name__ == "__main__":
     main()
