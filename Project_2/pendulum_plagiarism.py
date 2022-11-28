@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 # Bob mass (kg), pendulum length (m), acceleration due to gravity (m.s-2).
-m, L, g = 1, 1, 9.81
+L, g = 2, 9.81
 # Initial angular displacement (rad), tangential velocity (m.s-1)
-theta0, v0 = np.radians(60), 0
+theta0, v0 = np.radians(90), 0
 
 # Estimate of the period using the harmonic (small displacement) approximation.
 # The real period will be longer than this.
@@ -37,6 +37,9 @@ while True:
 
     theta.append(new_theta)
     v.append(new_v)
+
+print(theta)
+print(v)
 
 nsteps = len(theta)
 

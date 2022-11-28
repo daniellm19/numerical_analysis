@@ -72,9 +72,9 @@ class Pendulum:
 
         def get_coords(th):
             """Return the (x, y) coordinates of the bob at angle th."""
-            return self.L * np.sin(th), -self.L * np.cos(th)
+            return (self.L * np.sin(th), -self.L * np.cos(th))
 
-        theta, _ = self.euler_step()
+        y_list, _ = self.euler_step()
         # Initialize the animation plot. Make the aspect ratio equal so it looks right.
         fig = plt.figure()
         ax = fig.add_subplot(aspect='equal')
@@ -91,12 +91,12 @@ class Pendulum:
 
         def animate(i):
             """Update the animation at frame i."""
-            x, y = get_coords(theta[i])
+            x, y= get_coords(y_list[i][0])
             line.set_data([0, x], [0, y])
             circle.set_center((x, y))
 
         interval = dt * 1000
-        ani = animation.FuncAnimation(fig, animate, frames=len(theta), repeat=False,
+        ani = animation.FuncAnimation(fig, animate, frames=len(y_list), repeat=False,
                                     interval=interval)
         plt.show()
 
@@ -117,11 +117,11 @@ if __name__ == "__main__":
     # pend.plot_euler_step()
 
     # # Program 3
-    # T = 20
-    # n = 500
-    # y_0 = [pi/2,0]
-    # pend = Pendulum(y_0, n, T)
-    # pend.plot_euler_step()
+    T = 20
+    n = 500
+    y_0 = [pi/12,0]
+    pend = Pendulum(y_0, n, T)
+    pend.simple_simulate()
 
     # Program 4
     T = 20
