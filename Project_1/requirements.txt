@@ -1,0 +1,4 @@
+matplotlib==3.5.2
+numpy==1.21.6
+sympy==1.11.1
+nptyping==2.4.1
