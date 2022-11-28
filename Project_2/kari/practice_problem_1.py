@@ -16,7 +16,7 @@ def answer(t):
     return pow(t, 2) + 2
 
 def main():
-    code(2, 50, 3)
+    code(2, 1000, 3)
     h = 0.01
     y = [answer(0)]
     t = [0]
