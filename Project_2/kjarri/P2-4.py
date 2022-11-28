@@ -1,0 +1,64 @@
+import matplotlib.pyplot as plt
+from numpy import sin, pi, cos, sqrt
+
+
+#constants:
+g=9.81
+
+def ydot(t:float, y: list, L: float):
+    z = []
+    z.append(y[1])
+    z.append(-g/L*sin(y[0]))
+    return z
+
+def eulerstep(x, n, T, L: float):
+    h = T/n
+    t = 0
+    t_list = []
+    y_list = []
+    for i in range(n):
+        y=[0,0]
+        for j in range(len(y)):
+            y[j]=x[j] + h * ydot(t,x, L)[j]
+        y_list.append(y)
+        x = y
+        t += h
+        t_list.append(t)
+
+    return y_list, t_list, h
+
+def point_coordenents(position: float, L: float):
+    x = sin(position) * L
+    y = -cos(position) * L
+    return x, y
+
+def ani_plot(t: list, positions: list, L: float, h: float):
+    
+    for position in positions:
+        plt.clf()
+        plt.xlim(-2.5,2.5)
+        plt.ylim(-2.5,2.5)
+        x, y = point_coordenents(position, L)
+        plt.plot([0,x], [0,y])
+        plt.scatter(x, y, s=100, c='r')
+        plt.pause(h)
+    plt.show()
+
+def main():
+    T = 20
+    n = 500
+    L = 2
+    y_0 = [pi/12,0]
+    problem = input('Do you want to run problem 3 or 4? ')
+    if problem == '4':
+        y_0[0] = pi/2
+        print('Running problem 4, enjoy!')
+    else:
+        print('Running problem 3, enjoy!')
+    y, t, h = eulerstep(y_0, n, T, L)
+    position, velocity = map(list, zip(*y))
+    ani_plot(t, position, L, h)
+    plt.clf()
+
+
+main()
