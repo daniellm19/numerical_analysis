@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 from numpy import sin, pi
-import matplotlib.animation as animation
 
 #constants:
 g=9.81
@@ -36,10 +35,8 @@ def main():
     y_0 = [pi/2,0]
     y, t = eulerstep(y_0, n, T)
     plt.figure(figsize=(9, 3))
-    plt.subplot(121)
+    plt.plot(t,y)
     plt.show()
-
-
 
 
 main()
