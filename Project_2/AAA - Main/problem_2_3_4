@@ -32,7 +32,9 @@ def Problem_one_euler_method(T, n, z_0):
 
     return t, theta[0], theta[1]
 
-def problem_2_3(z_0):
+# Problem 3 & 4 starts here
+
+def animate_pendulum(z_0):
     
     L = 2
     T = 20 # the interval of t [0, T]
@@ -76,6 +78,7 @@ def main():
     else:
         print("wrong input, I´m shutting down!")
         quit()
-    problem_2_3(z_0)
+        
+    animate_pendulum(z_0)
     
 main()
