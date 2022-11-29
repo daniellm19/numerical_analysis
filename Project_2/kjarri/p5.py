@@ -38,6 +38,7 @@ def ani_plot(t: list, positions: list, L: float, h: float):
     
     for position in positions:
         plt.clf()
+        plt.grid()
         plt.xlim(-2.5,2.5)
         plt.ylim(-2.5,2.5)
         x, y = point_coordenents(position, L)
@@ -60,7 +61,7 @@ def main():
     y, t, h = runge_kutta(y_0, n, T, L)
     print(y)
     position, velocity = map(list, zip(*y))
-    #ani_plot(t, position, L, h)
+    ani_plot(t, position, L, h)
     plt.clf()
     plt.plot(t,y)
     plt.show()
