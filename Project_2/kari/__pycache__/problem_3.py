@@ -8,9 +8,8 @@ T = 20 # the interval of t [0, T]
 n = 500 # the segments to break down the interval into
 z_0 = [pi/12, 0] # inital values of pendulum in vector. Can be changed at convinience. [angular position, angular speed]
 L = 2
+
 bob_radius = 0.1
-
-
 fig = plt.figure()
 #fig.add_axes(3, 3, 3, 3)
 ax = fig.add_subplot(aspect='equal')
