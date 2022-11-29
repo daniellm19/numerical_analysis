@@ -59,7 +59,6 @@ def main():
     else:
         print('Running problem 3, enjoy!')
     y, t, h = runge_kutta(y_0, n, T, L)
-    print(y)
     position, velocity = map(list, zip(*y))
     ani_plot(t, position, L, h)
     plt.clf()

@@ -48,7 +48,7 @@ def ani_plot(t: list, angle1: list, angle2: list, L: float, h: float):
         plt.scatter(x1, y1, s=10, c='r')
         plt.scatter(x2, y2, s=10, c='b')
         plt.plot([x1,x2], [y1,y2])
-        plt.pause(h/26)
+        plt.pause(h)
     plt.show()
 
 def main():
@@ -58,6 +58,7 @@ def main():
     m = 1
     y_0 = np.array([pi+0.1, 0, pi, 0])
     y, t, h = runge_kutta(y_0, n, T, L, m)
+    print(y)
     angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
     ani_plot(t, angle1, angle2, L, h)
     plt.clf()
