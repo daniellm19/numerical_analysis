@@ -39,7 +39,7 @@ def animate_pendulum(angle1, velocity1, angle2, velocity2, L, T):
 
     # Set the plot limits so that the pendulum has room to swing!
     ax.set_xlim(-4, 4)
-    ax.set_ylim(-4, 4)
+    ax.set_ylim(-4, 4.2)
 
     theta0 = pi/12
 
