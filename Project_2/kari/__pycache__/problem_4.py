@@ -39,6 +39,6 @@ def animate(i):
     circle.set_center((x, y))
 
 
-ani = animation.FuncAnimation(fig, animate, frames=n, repeat=False, interval=T*2) # The interval calculates frames * interval / seconds , for some reason so we multiply by two to get the 20 seconds
+ani = animation.FuncAnimation(fig, animate, frames=1000, repeat=False, interval=T*2) # The interval calculates frames * interval / seconds , for some reason so we use frames 1000 to account fot the full 20 seconds
 
 plt.show()

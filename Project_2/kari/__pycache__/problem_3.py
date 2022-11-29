@@ -36,6 +36,6 @@ def animate(i):
     circle.set_center((x, y))
 
 
-ani = animation.FuncAnimation(fig, animate, frames=n, repeat=True, interval=T)
+ani = animation.FuncAnimation(fig, animate, frames=1000, repeat=True, interval=T)
 
 plt.show()
