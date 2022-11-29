@@ -2,23 +2,30 @@ import matplotlib.pyplot as plt
 from numpy import sin, pi, cos, sqrt
 import numpy as np
 
+
 #constants:
 g=9.81
 
 def ydot(t:float, y: list, L: float):
     return np.array([y[1], -g/L*sin(y[0])])
 
-def eulerstep(x, n, T, L: float):
+
+def runge_kutta(x, n, T, L: float):
     h = T/n
     t = 0
     t_list = []
     y_list = []
     for _ in range(n):
-        y= np.array(x + h * ydot(t,x, L))
+        k1 = ydot(t, x, L)
+        k2 = ydot(t + h/2, x + h/2 * k1, L)
+        k3 = ydot(t + h/2, x + h/2 * k2, L)
+        k4 = ydot(t + h, x + h * k3, L)
+        y = np.array(x + h * (k1/6 + k2/3 + k3/3 + k4/6))
         y_list.append(y)
         x = y
         t += h
         t_list.append(t)
+
 
     return y_list, t_list, h
 
@@ -50,12 +57,13 @@ def main():
         print('Running problem 4, enjoy!')
     else:
         print('Running problem 3, enjoy!')
-    y, t, h = eulerstep(y_0, n, T, L)
+    y, t, h = runge_kutta(y_0, n, T, L)
+    print(y)
     position, velocity = map(list, zip(*y))
-    ani_plot(t, position, L, h)
+    #ani_plot(t, position, L, h)
+    plt.clf()
     plt.plot(t,y)
     plt.show()
-
 
 
 main()
