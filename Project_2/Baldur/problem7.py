@@ -30,22 +30,25 @@ def runge_kutta(x, n, T, L: float, m):
 
     return y_list, t_list, h
 
-def point_coordenents(position: float, L: float):
-    x = sin(position) * L
-    y = -cos(position) * L
-    return x, y
+def point_coordenents(angle1: float, angle2: float, L: float):
+    x1 = sin(angle1) * L
+    y1 = -cos(angle1) * L
+    x2 = L * sin(angle2) + x1
+    y2 = -cos(angle2) * L + y1
+    return x1, x2, y1, y2
 
-def ani_plot(t: list, positions: list, L: float, h: float):
-    
-    for position in positions:
+def ani_plot(t: list, angle1: list, angle2: list, L: float, h: float):
+    plt.grid()
+    for i in range(len(angle1)):
         plt.clf()
-        plt.grid()
-        plt.xlim(-2.5,2.5)
-        plt.ylim(-2.5,2.5)
-        x, y = point_coordenents(position, L)
-        plt.plot([0,x], [0,y])
-        plt.scatter(x, y, s=100, c='r')
-        plt.pause(h)
+        plt.xlim(-5,5)
+        plt.ylim(-5,5)
+        x1, x2, y1, y2 = point_coordenents(angle1[i], angle2[i], L)
+        #plt.plot([0,x1], [0,y1])
+        plt.scatter(x1, y1, s=10, c='r')
+        plt.scatter(x2, y2, s=10, c='b')
+        #plt.plot([x1,x2], [y1,y2])
+        plt.pause(h/26)
     plt.show()
 
 def main():
@@ -53,20 +56,14 @@ def main():
     n = 500
     L = 2
     m = 1
-    y_0 = np.array([pi/3, 0, pi/6, 0])
-    problem = input('Do you want to run problem 3 or 4? ')
-    if problem == '4':
-        y_0[0] = pi/2
-        print('Running problem 4, enjoy!')
-    else:
-        print('Running problem 3, enjoy!')
+    y_0 = np.array([pi+0.1, 0, pi, 0])
     y, t, h = runge_kutta(y_0, n, T, L, m)
-    print(y)
-    position1, velocity1, position2, velocity2 = map(list, zip(*y))
-    #ani_plot(t, position1, L, h)
-    #plt.clf()
-    plt.plot(t,y)
-    plt.show()
+
+    angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
+    ani_plot(t, angle1, angle2, L, h)
+    plt.clf()
+    #plt.plot(t,velocity2)
+    #plt.show()
 
 
 main()
