@@ -95,8 +95,8 @@ class Pendulum:
             line.set_data([0, x], [0, y])
             circle.set_center((x, y))
 
-        interval = dt * 1000
-        ani = animation.FuncAnimation(fig, animate, frames=len(y_list), repeat=False,
+        interval = dt * 100
+        ani = animation.FuncAnimation(fig, animate, frames=100*len(y_list), repeat=False,
                                     interval=interval)
         plt.show()
 
@@ -117,11 +117,11 @@ if __name__ == "__main__":
     # pend.plot_euler_step()
 
     # # Program 3
-    T = 20
-    n = 500
-    y_0 = [pi/12,0]
-    pend = Pendulum(y_0, n, T)
-    pend.simple_simulate()
+    # T = 20
+    # n = 500
+    # y_0 = [pi/12,0]
+    # pend = Pendulum(y_0, n, T)
+    # pend.simple_simulate()
 
     # Program 4
     T = 20
