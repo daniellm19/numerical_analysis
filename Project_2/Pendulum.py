@@ -100,6 +100,20 @@ class Pendulum:
                                     interval=interval)
         plt.show()
 
+    def runge_kutta(self):
+        t_list = [round(self.h*i,12) for i in range(n+1) if i!=0]    # List of time values         
+        y_list = []
+        for _ in range(n):
+            k1 = self.__ydot(x)
+            k2 = self.__ydot(x + self.h/2 * k1)
+            k3 = self.__ydot(x + self.h/2 * k2)
+            k4 = self.__ydot(x + self.h * k3)
+            y = np.array(x + self.h * (k1/6 + k2/3 + k3/3 + k4/6))
+            y_list.append(y)
+            x = y
+
+        return y_list, t_list
+
 if __name__ == "__main__":
 
     # # Program 1
