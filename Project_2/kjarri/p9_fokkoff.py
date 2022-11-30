@@ -49,7 +49,7 @@ def get_error(ini_val, good_n, ns, T, L, m):
         a1, v1, a2, v2 = map(list, zip(*y_bad_est))
         #print(np.array([abs(fin_good_a1 - a1[-1]), abs(fin_good_a2 - a2[-1]), abs(fin_good_v1 - v1[-1]), abs(fin_good_v2 - v2[-1])]))
         errors_norm.append(np.linalg.norm(np.array([abs(fin_good_a1 - a1[-1]), abs(fin_good_a2 - a2[-1]), abs(fin_good_v1 - v1[-1]), abs(fin_good_v2 - v2[-1])])))
-    slope = np.polyfit(np.log(errors_norm),np.log(ns), 1)[0]
+    slope = np.polyfit(np.log(errors_norm),(ns), 1)[0]
     #print(errors_norm)
     return errors_norm, slope
 
@@ -62,7 +62,7 @@ def main():
     ns = np.array([100,200,400,800,1600,3200,6400])
     L = 2
     m = 1
-    all_ini_vals = random_theta()[0:50]
+    all_ini_vals = random_theta()[0:20]
     all_errors_norm = []
     all_slopes = []
     i=0
@@ -85,7 +85,7 @@ def main():
     plt.xlabel('n')
     plt.subplot(122)
     plt.hist(all_slopes)
-    #plt.show()
+    plt.show()
 
 
 
