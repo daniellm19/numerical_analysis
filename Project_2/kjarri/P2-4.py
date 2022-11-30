@@ -52,9 +52,18 @@ def main():
         print('Running problem 3, enjoy!')
     y, t, h = eulerstep(y_0, n, T, L)
     position, velocity = map(list, zip(*y))
-    ani_plot(t, position, L, h)
-    plt.plot(t,y)
+    #ani_plot(t, position, L, h)
+    plot(t,position, velocity)
+    
+def plot(t,pos,vel):
+    plt.figure(figsize=(8,4))
+    plt.plot(t, pos, label="Pendulum's angle [rad]")
+    plt.plot(t, vel, label = "Pendulum's angular velocity [rad/s]")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Radians')
+    plt.legend()
     plt.show()
+
 
 
 
