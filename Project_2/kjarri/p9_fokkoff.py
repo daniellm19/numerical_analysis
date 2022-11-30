@@ -49,8 +49,9 @@ def get_error(ini_val, good_n, ns, T, L, m):
         a1, v1, a2, v2 = map(list, zip(*y_bad_est))
         #print(np.array([abs(fin_good_a1 - a1[-1]), abs(fin_good_a2 - a2[-1]), abs(fin_good_v1 - v1[-1]), abs(fin_good_v2 - v2[-1])]))
         errors_norm.append(np.linalg.norm(np.array([abs(fin_good_a1 - a1[-1]), abs(fin_good_a2 - a2[-1]), abs(fin_good_v1 - v1[-1]), abs(fin_good_v2 - v2[-1])])))
-    print(errors_norm)
-    return errors_norm
+    slope = np.polyfit(np.log(errors_norm),np.log(ns), 1)[0]
+    #print(errors_norm)
+    return errors_norm, slope
 
 
 
@@ -61,22 +62,30 @@ def main():
     ns = np.array([100,200,400,800,1600,3200,6400])
     L = 2
     m = 1
-    all_ini_vals = random_theta()[0:2]
+    all_ini_vals = random_theta()[0:50]
     all_errors_norm = []
+    all_slopes = []
     i=0
     for ini_val in all_ini_vals:
         print(i)
-        all_errors_norm.append(get_error(ini_val, good_n, ns, T, L, m))
-
+        error_norm, slope = get_error(ini_val, good_n, ns, T, L, m)
+        all_errors_norm.append(error_norm)
+        print(slope)
+        all_slopes.append(slope)
         i += 1
-
+    print(all_slopes)
+    print('Average:', np.average(all_slopes))
+    print('Min:', np.min(all_slopes))
+    print('Max:', np.max(all_slopes))
+    print('Median:', np.median(all_slopes))
+    plt.subplot(121)
     for e in all_errors_norm:
-        plt.plot(ns, e)
+        plt.loglog(ns, e)
     plt.ylabel('Error in angle θ1 [rad]')
     plt.xlabel('n')
-    plt.xscale('log', base=2)
-    plt.yscale('log', base=4)
-    plt.show()
+    plt.subplot(122)
+    plt.hist(all_slopes)
+    #plt.show()
 
 
 
