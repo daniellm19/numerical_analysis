@@ -55,7 +55,7 @@ def main():
     #hs = np.array([100/T,200/T,400/T,800/T,1600/T,3200/T,6400/T])
     L = 2
     m = 1
-    all_ini_vals = random_theta()
+    all_ini_vals = random_theta()[0:2]
     all_errors_norm = []
     all_slopes = []
     i=0
@@ -71,12 +71,12 @@ def main():
     print('Min:', np.min(all_slopes))
     print('Max:', np.max(all_slopes))
     print('Median:', np.median(all_slopes))
-    plt.subplot(121)
+    plt.subplot(211)
     for e in all_errors_norm:
         plt.loglog(ns, e)
     plt.ylabel('Error in angle θ1 [rad]')
     plt.xlabel('n')
-    plt.subplot(122)
+    plt.subplot(212)
     plt.hist(all_slopes)
     plt.show()
 
