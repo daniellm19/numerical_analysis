@@ -84,7 +84,7 @@ def second_pend_coords_offset(x_1, y_1, x_2, y_2):
 def main():
     T = 20
     n = 500
-    L = 2
+    L = 1
     m = 1
     y_0 = np.array([pi/3, 0, pi/6, 0])
     y, t, h = runge_kutta(y_0, n, T, L, m)
