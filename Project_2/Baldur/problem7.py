@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import sin,cos, pi
-<<<<<<< HEAD
-=======
 import matplotlib.animation as animation
->>>>>>> 8587107ac0ccd1be678e192378f535fe69695c6b
 
 #Global constants
 g = 9.81
@@ -33,29 +30,6 @@ def runge_kutta(x, n, T, L: float, m):
 
 
     return y_list, t_list, h
-<<<<<<< HEAD
-
-def point_coordenents(angle1: float, angle2: float, L: float):
-    x1 = sin(angle1) * L
-    y1 = -cos(angle1) * L
-    x2 = L * sin(angle2) + x1
-    y2 = -cos(angle2) * L + y1
-    return x1, x2, y1, y2
-
-def ani_plot(t: list, angle1: list, angle2: list, L: float, h: float):
-    plt.grid()
-    for i in range(len(angle1)):
-        plt.clf()
-        plt.xlim(-5,5)
-        plt.ylim(-5,5)
-        x1, x2, y1, y2 = point_coordenents(angle1[i], angle2[i], L)
-        plt.plot([0,x1], [0,y1])
-        plt.scatter(x1, y1, s=10, c='r')
-        plt.scatter(x2, y2, s=10, c='b')
-        plt.plot([x1,x2], [y1,y2])
-        plt.pause(h)
-    plt.show()
-=======
     
 def animate_penduli(x_1, y_1, x_2, y_2, T):
     
@@ -106,25 +80,12 @@ def second_pend_coords_offset(x_1, y_1, x_2, y_2):
         x_2[i] = x_1[i] + x_2[i]
         y_2[i] = y_1[i] + y_2[i]
     return x_2, y_2
->>>>>>> 8587107ac0ccd1be678e192378f535fe69695c6b
 
 def main():
     T = 20
     n = 500
     L = 2
     m = 1
-<<<<<<< HEAD
-    y_0 = np.array([pi+0.1, 0, pi, 0])
-    y, t, h = runge_kutta(y_0, n, T, L, m)
-    print(y)
-    angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
-    ani_plot(t, angle1, angle2, L, h)
-    plt.clf()
-
-
-
-main()
-=======
     y_0 = np.array([pi/3, 0, pi/6, 0])
     y, t, h = runge_kutta(y_0, n, T, L, m)
     angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
@@ -138,4 +99,3 @@ main()
     return
 
 main()
->>>>>>> 8587107ac0ccd1be678e192378f535fe69695c6b
