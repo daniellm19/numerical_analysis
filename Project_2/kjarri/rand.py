@@ -14,7 +14,6 @@ def random_angles(pend_pairs_amount: int):
     return rand_ini_vals
 
 y_0 = random_angles(100)
-#y_0 = [[pi/2, 0, pi/12, 0], [-pi/2, 0, pi/12, 0], [0, 0, pi/12, 0], [pi/12, 0, -pi/3, 0], [pi/4, 0, -pi/4, 0], [pi/2, 0, -pi/12, 0], [pi/2, 0, pi/12, 0], [0, 0, -pi/12, 0], [pi/12, 0, pi/3, 0], [pi/4, 0, pi/4, 0]]
 
 with open("random_ini_values.json", "w") as f:
     f.write(json.dumps(y_0))

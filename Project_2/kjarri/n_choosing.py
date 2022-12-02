@@ -34,14 +34,13 @@ def runge_kutta(x, n, T, L: float, m):
 
 def main():
     T = 20
-    #n = 500
     L = 2
     m = 1
     angle_1_final = []
     angle_2_final = []
     nn = []
+    y_0 = np.array([pi/3, 0, pi/6, 0])
     for n in range(10,50):
-        y_0 = np.array([pi/3, 0, pi/6, 0])
         y, t, h = runge_kutta(y_0, n*1000, T, L, m)
         angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
         angle_1_final.append(angle1[-1])
