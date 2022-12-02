@@ -32,10 +32,11 @@ def runge_kutta(x, n, T, L: float, m):
 
     return y_list, t_list, h
 
-def animate_penduli(x_1, y_1, x_2, y_2, n, h):
+def animate_penduli(x_1, y_1, x_2, y_2, n, h, title):
     
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(autoscale_on=False, xlim=(-4.2, 4.2), ylim=(-4.2, 4.2))
+    ax.set_title(title)
     ax.grid()   
     
     line_1, = ax.plot([], [], 'o-', c='blue', lw=1.5)
@@ -108,7 +109,7 @@ def main():
     x_1, y_1 = L * sin(angle1[:]), -L * cos(angle1[:])
     x_2, y_2 = L * sin(angle2[:]) + x_1, -L * cos(angle2[:]) + y_1
     
-    animate_penduli(x_1, y_1, x_2, y_2, n, h)
+    animate_penduli(x_1, y_1, x_2, y_2, n, h, "Michael cummings")
     plot(t, angle1, velocity1, "Pendulum 1 (blue pendulum)")
     plot(t, angle2, velocity2, "Pendulum 2 (red pendulum)")
     return
