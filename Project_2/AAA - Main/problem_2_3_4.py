@@ -36,28 +36,18 @@ def Problem_one_euler_method(T, n, z_0):
 
 # Problem 3 & 4 starts here
 
-def animate_pendulum(x, y, n, h):
+def animate_pendulum(x, y, h):
     
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(autoscale_on=False, xlim=(-2.2, 2.2), ylim=(-2.2, 2.2))
     ax.grid()   
     
     line, = ax.plot([], [], 'o-', c='blue', lw=1.5)
-    trace, = ax.plot([], [], '.-', c='red', lw=0.5, ms=1)
     time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-    trajectory_x, trajectory_y = deque(maxlen=n), deque(maxlen=n)
   
     def animate(i):
         xLine = [0, x[i]]
         yLine = [0, y[i]]
-        
-        if i == 0:
-            trajectory_x.clear()
-            trajectory_y.clear()
-
-        trajectory_x.appendleft(x[1])
-        trajectory_y.appendleft(y[1])
-
         
         line.set_data(xLine, yLine)
         time_text.set_text(f"time = {i*h:.1f}s")
@@ -84,8 +74,7 @@ def main():
         quit()
         
     t, angle, velocity = Problem_one_euler_method(T, n, y_0) # get the estimation for eulers method on problem one differential equation
-    print(angle)
     x, y = L * sin(angle[:]), -L * cos(angle[:])
-    animate_pendulum(x, y, n, h)
+    animate_pendulum(x, y, h)
     
 main()
