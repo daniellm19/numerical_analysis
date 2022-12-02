@@ -41,7 +41,7 @@ def animate_pendulum(x, y, h):
     ax = fig.add_subplot(autoscale_on=False, xlim=(-2.2, 2.2), ylim=(-2.2, 2.2))
     ax.grid()   
     
-    line, = ax.plot([], [], 'o-', c='blue', lw=1.5)
+    line = ax.plot([], [], 'o-', c='blue', lw=1.5)
     time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
   
     def animate(i):
