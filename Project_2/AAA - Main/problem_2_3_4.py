@@ -56,6 +56,14 @@ def animate_pendulum(x, y, h):
         fig, animate, len(x), interval=h*1000, blit=True, repeat=False)
     plt.show()
 
+def plot(t,pos,vel):
+    plt.figure(figsize=(8,4))
+    plt.plot(t, pos, label="Pendulum's angle [rad]")
+    plt.plot(t, vel, label = "Pendulum's angular velocity [rad/s]")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Radians')
+    plt.legend()
+    plt.show()
     
 def main():
     L = 2
@@ -74,6 +82,8 @@ def main():
         
     t, angle, velocity = Problem_one_euler_method(T, n, y_0) # get the estimation for eulers method on problem one differential equation
     x, y = L * sin(angle[:]), -L * cos(angle[:])
+    
     animate_pendulum(x, y, h)
+    plot(t, angle, velocity)
     
 main()

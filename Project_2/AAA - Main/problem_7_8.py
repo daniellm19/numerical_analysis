@@ -69,6 +69,14 @@ def animate_penduli(x_1, y_1, x_2, y_2, n, h):
         fig, animate, len(x_1), interval=h*1000, blit=True, repeat=False)
     plt.show()
 
+def plot(t,pos,vel, pendulum_name):
+    plt.figure(figsize=(8,4))
+    plt.plot(t, pos, label=f"{pendulum_name} angle [rad]")
+    plt.plot(t, vel, label = f"{pendulum_name} angular velocity [rad/s]")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Radians')
+    plt.legend()
+    plt.show()
 
 def main():
     T = 20
@@ -76,6 +84,22 @@ def main():
     L = 2
     m = 1
     y_0 = np.array([pi/3, 0, pi/6, 0])
+    inital_values = input("\n1 ->   θ_1 = π/3 , θ'_1 = 0 , θ_1 = π/6 , θ'_1 = 0 . (These are the inital values for problem 7)\n"
+        + "\nHere are some other random initial values:"
+        + "\n2 ->   θ_1 = π , θ'_1 = 0 , θ_2 = π , θ'_2 = 4 "
+        + "\n3 ->   θ_1 = π/12 , θ'_1 = 3 , θ_2 = π/6 , θ'_2 = -3 "
+        + "\n4 ->   θ_1 = 0 , θ'_1 = 0 , θ_2 = 2π/3 , θ'_2 = 8 "
+        
+        "\n\nChoose inital values for both penduli: (1/2/3/4) " )
+    if inital_values == '1':
+        pass
+    elif inital_values == '2':
+        y_0 = np.array([pi, 0, pi, 4])
+    elif inital_values == '3':
+        y_0 = np.array([pi/12, 3, pi/6, -3])
+    elif inital_values == '4':
+        y_0 = np.array([0, 0, 2*pi/3, 8]) 
+        
     y, t, h = runge_kutta(y_0, n, T, L, m)
     angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
     
@@ -84,7 +108,8 @@ def main():
     x_2, y_2 = L * sin(angle2[:]) + x_1, -L * cos(angle2[:]) + y_1
     
     animate_penduli(x_1, y_1, x_2, y_2, n, h)
-    
+    plot(t, angle1, velocity1, "Pendulum 1 (blue pendulum)")
+    plot(t, angle2, velocity2, "Pendulum 2 (red pendulum)")
     return
 
 main()

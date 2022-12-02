@@ -49,6 +49,15 @@ def animate_pendulum(x, y, h):
     ani = animation.FuncAnimation(
         fig, animate, len(x), interval=h*1000, blit=True, repeat=False)
     plt.show()
+    
+def plot(t,pos,vel):
+    plt.figure(figsize=(8,4))
+    plt.plot(t, pos, label="Pendulum's angle [rad]")
+    plt.plot(t, vel, label = "Pendulum's angular velocity [rad/s]")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Radians')
+    plt.legend()
+    plt.show()
 
 def main():
     T = 20
@@ -64,11 +73,8 @@ def main():
     y, t, h = runge_kutta(y_0, n, T, L)
     angle, velocity = map(list, zip(*y))
     x, y = L * sin(angle[:]), -L * cos(angle[:])
-    animate_pendulum(x, y, h)
     
-    plt.clf()
-    plt.plot(t,y)
-    plt.show()
-
+    animate_pendulum(x, y, h)
+    plot(t, angle, velocity)
 
 main()
