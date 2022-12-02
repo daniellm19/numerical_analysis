@@ -65,11 +65,15 @@ def main():
     L = 2
     y_0 = np.array([pi/12,0])
     problem = input('Do you want to run problem 3 or 4? ')
-    if problem == '4':
+    if problem == '3':
+        pass
+    elif problem == '4':
         y_0[0] = pi/2
         print('Running problem 4, enjoy!')
     else:
-        print('Running problem 3, enjoy!')
+        print("wrong input, I´m shutting down!")
+        quit()
+        
     y, t, h = runge_kutta(y_0, n, T, L)
     angle, velocity = map(list, zip(*y))
     x, y = L * sin(angle[:]), -L * cos(angle[:])

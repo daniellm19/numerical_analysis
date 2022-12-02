@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import sin,cos, pi
-
+import matplotlib.animation as animation
+from collections import deque
 
 #Global constants
 g = 9.81
@@ -34,12 +35,12 @@ def runge_kutta(x, n, T, L: float, m):
 
 def plot(angle: list, angle_error: list, t, title):
     fig = plt.figure(figsize=(12, 7))  
-    plt.subplots_adjust(top=0.9, left=0.06, right=0.96, hspace=0.3, bottom=0.06)
+    plt.subplots_adjust(top=0.9, left=0.06, right=0.96, hspace=0.33, bottom=0.08)
     
     for i in range(len(angle_error)):
         plt.subplot(3, 2, i+1)
         plt.plot(t, angle_error[i], label=f"Pendulum's angle (with error 10^-{i+1}) [rad]")
-        plt.plot(t, angle, label=f"Pendulum's angle (no error) [rad]")
+        plt.plot(t, angle, label="Pendulum's angle (no error) [rad]")
         
         plt.xlabel('Time [s]')
         plt.ylabel('Radians')
@@ -47,7 +48,72 @@ def plot(angle: list, angle_error: list, t, title):
         fig.suptitle(title, fontsize=15)
         plt.grid()
         
+def animate_penduli(x_1, y_1, x_2, y_2, ex_1, ey_1, ex_2, ey_2, n, h, k):
     
+    fig = plt.figure(figsize=(10, 5))
+    plt.subplots_adjust(top=0.9, left=0.06, right=0.96, hspace=0.3, bottom=0.06)
+    ax = fig.add_subplot(1, 2, 1, autoscale_on=False, xlim=(-4.2, 4.2), ylim=(-4.2, 4.2))
+    ax.set_title("Double pendulum")
+    ax2 = fig.add_subplot(1, 2, 2, autoscale_on=False, xlim=(-4.2, 4.2), ylim=(-4.2, 4.2))
+    ax2.set_title(f"Double pendulum with error 10^-{k}")
+    ax.grid()   
+    ax2.grid()
+    
+    # inital setup for double pendulum
+    line_1, = ax.plot([], [], 'o-', c='blue', lw=1.5)
+    line_2, = ax.plot([], [], 'o-', c='red', lw=1.5)
+    trace, = ax.plot([], [], '.-', c='red', lw=0.5, ms=1)
+    time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+    trajectory_x, trajectory_y = deque(maxlen=n), deque(maxlen=n)
+    
+    # inital setup for double pendulum with error k
+    eline_1, = ax2.plot([], [], 'o-', c='blue', lw=1.5)
+    eline_2, = ax2.plot([], [], 'o-', c='red', lw=1.5)
+    etrace, = ax2.plot([], [], '.-', c='red', lw=0.5, ms=1)
+    etime_text = ax2.text(0.05, 0.9, '', transform=ax2.transAxes)
+    etrajectory_x, etrajectory_y = deque(maxlen=n), deque(maxlen=n)
+    
+    def animate(i):
+        # animating double pendulum
+        x1 = [0, x_1[i]]
+        y1 = [0, y_1[i]]
+        x2 = [x_1[i], x_2[i]]
+        y2 = [y_1[i], y_2[i]]
+        
+        # animating double pendulum with error k
+        ex1 = [0, ex_1[i]]
+        ey1 = [0, ey_1[i]]
+        ex2 = [ex_1[i], ex_2[i]]
+        ey2 = [ey_1[i], ey_2[i]]
+        
+        if i == 0:
+            trajectory_x.clear()
+            trajectory_y.clear()
+            etrajectory_x.clear()
+            etrajectory_y.clear()
+
+        trajectory_x.appendleft(x2[1])
+        trajectory_y.appendleft(y2[1])
+        etrajectory_x.appendleft(ex2[1])
+        etrajectory_y.appendleft(ey2[1])
+
+        
+        line_1.set_data(x1, y1)
+        line_2.set_data(x2, y2)
+        trace.set_data(trajectory_x, trajectory_y)
+        time_text.set_text(f"time = {i*h:.1f}s")
+        
+        eline_1.set_data(ex1, ey1)
+        eline_2.set_data(ex2, ey2)
+        etrace.set_data(etrajectory_x, etrajectory_y)
+        etime_text.set_text(f"time = {i*h:.1f}s")
+        
+        return line_1, line_2, eline_1, eline_2, trace, etrace, time_text, etime_text
+   
+    ani = animation.FuncAnimation(
+        fig, animate, len(x_1), interval=h*1000, blit=True, repeat=False)
+    plt.show()
+    return 
     
 def main():
     T = 40
@@ -70,9 +136,28 @@ def main():
         angle1_error_list.append(angle1_error), angle2_error_list.append(angle2_error)
     
     plot(angle1, angle1_error_list, t, 'Inner pendulum comparison')
-    plot(angle2, angle2_error_list, t, 'Outer pendulum comparison')
-        
-    plt.show()  
+    plot(angle2, angle2_error_list, t, 'Outer pendulum comparison') 
+    plt.show()
+    
+    compare_k = input('Animate correct double penduli, and compare with the one with error with k = [1, 2, 3, 4, 5]. Choose k: ')
+    if not compare_k.isdigit():
+        print("wrong input, I´m shutting down!")
+        quit()
+    k = int(compare_k)
+    if k < 1 | k > 5:
+        print("wrong input, I´m shutting down!")
+        quit()
+    
+    x_1, y_1 = L * sin(angle1[:]), -L * cos(angle1[:])
+    x_2, y_2 = L * sin(angle2[:]) + x_1, -L * cos(angle2[:]) + y_1
+    ex_1, ey_1 = L * sin(angle1_error_list[k-1][:]), -L * cos(angle1_error_list[k-1][:])
+    ex_2, ey_2 = L * sin(angle2_error_list[k-1][:]) + ex_1, -L * cos(angle2_error_list[k-1][:]) + ey_1
+    animate_penduli(x_1, y_1, x_2, y_2, ex_1, ey_1, ex_2, ey_2, n, h, k)
+    
+   
+    
+    plt.show()
+    
         
     
     #angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
