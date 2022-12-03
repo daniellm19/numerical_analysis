@@ -2,11 +2,8 @@ import matplotlib
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from celluloid import Camera
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import numpy as np
 from numpy import sin,cos, pi
 import matplotlib.animation as animation
 import random
@@ -42,7 +39,6 @@ def runge_kutta_plot(x, n, T, L: float, m, name, color, first_num, second_num):
         #plt.plot(y[0], y[2], markersize=3, marker='o')
         y_list.append(y)
         x = y
-        print(y[0])
 
     plt.ylabel(r"$\theta_2$")
     plt.xlabel(r"$\theta_1$")
@@ -53,14 +49,13 @@ def runge_kutta_plot(x, n, T, L: float, m, name, color, first_num, second_num):
     anim = camera.animate(blit=False, interval=10)
     anim.save(f'{name}.mp4')
 
-    print("ok2")
 
     return y_list, t_list
 
 def main():
     i = 10
-    t=[]
-    y=[]
+    t = []
+    y = []
     T = 200
     n = 1500
     n2 = 10000
