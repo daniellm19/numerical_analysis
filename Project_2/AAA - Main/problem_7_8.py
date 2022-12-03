@@ -3,6 +3,7 @@ import numpy as np
 from numpy import sin, cos, pi
 import matplotlib.animation as animation
 from collections import deque
+import random
 
 #Global constants
 g = 9.81
@@ -100,6 +101,12 @@ def main():
         y_0 = np.array([pi/12, 3, pi/6, -3])
     elif inital_values == '4':
         y_0 = np.array([0, 0, 2*pi/3, 8]) 
+    elif inital_values == '5':
+        # Hidden secret intial value
+        y_0 = np.array([random.uniform(0, 2*pi), random.uniform(0, 50), random.uniform(0, 2*pi), random.uniform(0,50)])
+    elif inital_values == '6':
+        # Hidden secret intial value
+        y_0 = np.array([0, 0, 0, 7])
         
     y, t, h = runge_kutta(y_0, n, T, L, m)
     angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
