@@ -1,13 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import sin,cos, pi
-
+import matplotlib.animation as animation
 
 #Global constants
 g = 9.81
-
-def error(k):
-    return pow(10,-k)
 
 def ydot(t:float, y: list, L: float, m:float):
     theta_1pp = ((m*L*pow(y[1],2)*sin(y[2] - y[0])*cos(y[2] - y[0])) + (m*g*sin(y[2])*cos(y[2] - y[0])) + m * L * pow(y[3],2) * sin(y[2] - y[0]) - (m+m) * g*sin(y[0]))/((m+m)*L - m*L*pow(cos(y[2] - y[0]),2))
@@ -30,31 +27,39 @@ def runge_kutta(x, n, T, L: float, m):
         x = y
         t += h
         t_list.append(t)
+
+
     return y_list, t_list, h
+    
 
 def main():
-    T = 40
-    n = 500
+    T = 20
     L = 2
     m = 1
-    k = [1,2,3,4,5]
-    y0 = np.array([2*pi/3, 0, pi/6, 0])
-    y, t, h = runge_kutta(y0, n, T, L, m)
-    angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
-    diff_y = []
-    counter = 1
-    for num in k:
-        y0 = np.array([2*pi/3+error(num), 0, pi/6 + error(num), 0])
-        y_n, t_n, h_n = runge_kutta(y0, n, T, L, m)
-        diff_y.append([y_n, t_n, h_n])
-        angle1n, velocity1n, angle2n, velocity2n = map(list, zip(*y_n))
-        plt.figure()
-        plt.plot(t_n, angle1n)
-        plt.plot(t, angle1)
-        plt.grid()
-        counter += 1  
-    
+    angle_1_final = []
+    angle_2_final = []
+    nn = []
+    y_0 = np.array([pi/3, 0, pi/6, 0])
+    for n in range(10,50):
+        y, t, h = runge_kutta(y_0, n*1000, T, L, m)
+        angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
+        angle_1_final.append(angle1[-1])
+        angle_2_final.append(angle2[-1])
+        nn.append(n*1000)
+        print(n)
+
+
+    plt.subplot(121)
+    plt.plot(nn, angle_1_final)
+    plt.ylabel('Estimated angle θ1 [rad]')
+    plt.xlabel('Value for n')
+    plt.subplot(122)
+    plt.plot(nn, angle_2_final)
+    plt.ylabel('Estimated angle θ2 [rad]')
+    plt.xlabel('Value for n')
     plt.show()
-    #angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
+
+
+
 
 main()

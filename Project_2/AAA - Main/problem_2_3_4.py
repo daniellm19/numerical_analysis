@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from math import sin, cos, pi
+from numpy import sin, cos, pi
 import numpy as np
 import matplotlib.animation as animation
 
@@ -13,16 +13,16 @@ def y_dot(t, y):
     L = 2 # lenght of pendulum in m
     return [y[1], -(g/L)*sin(y[0])]
 
-def Problem_one_euler_method(T, n, z_0):
+def Problem_one_euler_method(T, n, y_0):
     """
     T: interval from [0, T]
     n: number of segmentations on interval [0, T]
-    z_0: initial vector values for angular position and angular speed. [theta, theta_prime]
+    y_0: initial vector values for angular position and angular speed. [theta, theta_prime]
     
     This function uses the euler method to emulate the movement of pendumulum with differential equation from problem one (see equations in eulerstep and y_dot).
     Returns t, theta[0], theta[1] (t = time array, theta[0] = theta position array, theta[1] = theta speed array)
     """
-    z = z_0
+    z = y_0
     h = T/n
     t = [i*h for i in range(0, n)]
     theta = [[], []] # array for the changing values of theta
@@ -35,51 +35,55 @@ def Problem_one_euler_method(T, n, z_0):
 
 # Problem 3 & 4 starts here
 
-def animate_pendulum(z_0):
+def animate_pendulum(x, y, h):
     
-    L = 2
-    T = 20 # the interval of t [0, T]
-    n = 500 # the segments to break down the interval into
-    bob_radius = 0.1
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(autoscale_on=False, xlim=(-2.2, 2.2), ylim=(-2.2, 2.2))
+    ax.grid()   
     
-    fig = plt.figure()
-    ax = fig.add_subplot(aspect='equal')
-
-    # Set the plot limits so that the pendulum has room to swing!
-    ax.set_xlim(-2.5, 2.5)
-    ax.set_ylim(-2.5, 2.5)
-
-    t, theta, theta_prime = Problem_one_euler_method(T, n, z_0) # get the estimation for eulers method on problem one differential equation
-    theta0 = pi/12
-
-    def get_coords(th):
-        """Return the (x, y) coordinates of the bob at angle th."""
-        return L * np.sin(th), -L * np.cos(th)
-
-    line, = ax.plot([0, -2*sin(z_0[0])], [0, 2*cos(z_0[1])], lw=3, c='k') # initial pendulum position
-    circle = ax.add_patch(plt.Circle(get_coords(theta0), bob_radius,
-                        fc='r', zorder=3))
+    line = ax.plot([], [], 'o-', c='blue', lw=1.5)
+    time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+  
     def animate(i):
-        x = 2 * sin(theta[i])
-        y = 2 * -cos(theta[i])
-        line.set_data([0, x], [0, y])
-        circle.set_center((x, y))
+        xLine = [0, x[i]]
+        yLine = [0, y[i]]
+        
+        line.set_data(xLine, yLine)
+        time_text.set_text(f"time = {i*h:.1f}s")
+        return line, time_text
+   
+    ani = animation.FuncAnimation(
+        fig, animate, len(x), interval=h*1000, blit=True, repeat=False)
+    plt.show()
 
-
-    ani = animation.FuncAnimation(fig, animate, frames=1000, repeat=True, interval=T)
-    plt.grid()
+def plot(t,pos,vel):
+    plt.figure(figsize=(8,4))
+    plt.plot(t, pos, label="Pendulum's angle [rad]")
+    plt.plot(t, vel, label = "Pendulum's angular velocity [rad/s]")
+    plt.xlabel('Time [s]')
+    plt.ylabel('Radians')
+    plt.legend()
     plt.show()
     
 def main():
+    L = 2
+    T = 20 # the interval of t [0, T]
+    n = 500 # the segments to break down the interval into
+    h = T/n
+    
     problem = input("Do you want to run problem 3 or 4? (3/4): ")
     if problem == "3":
-        z_0 = [pi/12, 0] # inital values of pendulum in vector for problem 3
+        y_0 = [pi/12, 0] # inital values of pendulum in vector for problem 3
     elif problem == "4":
-        z_0 = [pi/2, 0] # inital values of pendulum in vector for problem 4
+        y_0 = [pi/2, 0] # inital values of pendulum in vector for problem 4
     else:
         print("wrong input, I´m shutting down!")
         quit()
         
-    animate_pendulum(z_0)
+    t, angle, velocity = Problem_one_euler_method(T, n, y_0) # get the estimation for eulers method on problem one differential equation
+    x, y = L * sin(angle[:]), -L * cos(angle[:])
+    
+    animate_pendulum(x, y, h)
+    plot(t, angle, velocity)
     
 main()
