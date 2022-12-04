@@ -134,11 +134,11 @@ def main():
     n = 500
     L = 2 # Length in meters
     m = 1 # mass in kg
-    m_pivot = 0.01 # Mass of the pivot point in Kg
+    m_pivot = 100 # Mass of the pivot point in Kg
     g = get_g() # Gravitational acceleration [m/s^2]
-    d = 5 # Friction coefficient
+    d = 0.3 # Friction coefficient
     E = get_E(m_pivot) # How much energy is requiered to melt the pivot point
-    y_0 = np.array([-pi+0.1, 0, -pi, 0])
+    y_0 = np.array([pi/3, 0, pi/6, 0])
 
     try:
         y, t, h, y_throw, x_throw = runge_kutta(y_0, n, T, L, m, g, d, E)
