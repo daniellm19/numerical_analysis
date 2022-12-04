@@ -127,12 +127,12 @@ def animate_penduli(x_1, y_1, x_2, y_2, ex_1, ey_1, ex_2, ey_2, n, h, k):
         line_1.set_data(x1, y1)
         line_2.set_data(x2, y2)
         trace.set_data(trajectory_x, trajectory_y)
-        time_text.set_text(f"time = {i*h:.1f}s")
+        time_text.set_text(f"time = {i*h+0.1:.1f}s")
         
         eline_1.set_data(ex1, ey1)
         eline_2.set_data(ex2, ey2)
         etrace.set_data(etrajectory_x, etrajectory_y)
-        etime_text.set_text(f"time = {i*h:.1f}s")
+        etime_text.set_text(f"time = {i*h+0.1:.1f}s")
         
         return line_1, line_2, eline_1, eline_2, trace, etrace, time_text, etime_text
    

@@ -33,7 +33,7 @@ def runge_kutta(x, n, T, L: float, m):
 
     return y_list, t_list, h
 
-def animate_penduli(x_1, y_1, x_2, y_2, n, h):
+def animate_penduli(x_1, y_1, x_2, y_2, n, h, title):
     
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(autoscale_on=False, xlim=(-4.2, 4.2), ylim=(-4.2, 4.2))
@@ -42,9 +42,10 @@ def animate_penduli(x_1, y_1, x_2, y_2, n, h):
     line_1, = ax.plot([], [], 'o-', c='blue', lw=1.5)
     line_2, = ax.plot([], [], 'o-', c='red', lw=1.5)
     trace, = ax.plot([], [], '.-', c='red', lw=0.5, ms=1)
+    inner_trace, = ax.plot([], [], '.-', c='blue', lw=0.5, ms=1)
     time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
     trajectory_x, trajectory_y = deque(maxlen=n), deque(maxlen=n)
-    
+    inner_trajectory_x, inner_trajectory_y = deque(maxlen=n), deque(maxlen=n)
     def animate(i):
         x1 = [0, x_1[i]]
         y1 = [0, y_1[i]]
@@ -55,29 +56,35 @@ def animate_penduli(x_1, y_1, x_2, y_2, n, h):
         if i == 0:
             trajectory_x.clear()
             trajectory_y.clear()
+            inner_trajectory_x.clear()
+            inner_trajectory_y.clear()
 
         trajectory_x.appendleft(x2[1])
         trajectory_y.appendleft(y2[1])
-
+        inner_trajectory_x.appendleft(x1[1])
+        inner_trajectory_y.appendleft(y1[1])
         
         line_1.set_data(x1, y1)
         line_2.set_data(x2, y2)
         trace.set_data(trajectory_x, trajectory_y)
+        inner_trace.set_data(inner_trajectory_x, inner_trajectory_y)
         time_text.set_text(f"time = {i*h:.1f}s")
-        return line_1, line_2, trace, time_text
+        return line_1, line_2, trace, inner_trace, time_text
    
     ani = animation.FuncAnimation(
         fig, animate, len(x_1), interval=h*1000, blit=True, repeat=False)
+    plt.title(title)
     plt.show()
     return 
 
-def plot(t,pos,vel, pendulum_name):
+def plot(t,pos,vel, pendulum_name, title):
     plt.figure(figsize=(8,4))
     plt.plot(t, pos, label=f"{pendulum_name} angle [rad]")
     plt.plot(t, vel, label = f"{pendulum_name} angular velocity [rad/s]")
     plt.xlabel('Time [s]')
     plt.ylabel('Radians')
     plt.legend()
+    plt.title(title)
     plt.show()
 
 def main():
@@ -92,15 +99,18 @@ def main():
         + "\n3 ->   θ_1 = π/12 , θ'_1 = 3 , θ_2 = π/6 , θ'_2 = -3 "
         + "\n4 ->   θ_1 = 0 , θ'_1 = 0 , θ_2 = 2π/3 , θ'_2 = 8 "
         
-        "\n\nChoose inital values for both penduli: (1/2/3/4) " )
+        "\n\nChoose inital values for double penduli: (1/2/3/4) " )
     if inital_values == '1':
-        pass
+        title =  "Inital values:  [π/3, 0, π/6, 0]  [angle1, velocity1, angle2, velocity2]"
     elif inital_values == '2':
         y_0 = np.array([pi, 0, pi, 4])
+        title =  "Inital values:  [π, 0, π, 4]  [angle1, velocity1, angle2, velocity2]"
     elif inital_values == '3':
         y_0 = np.array([pi/12, 3, pi/6, -3])
+        title =  "Inital values:  [π/12, 3, π/6, -3]  [angle1, velocity1, angle2, velocity2]"
     elif inital_values == '4':
         y_0 = np.array([0, 0, 2*pi/3, 8]) 
+        title =  "Inital values:  [0, 0, 2π/3, 8]  [angle1, velocity1, angle2, velocity2]"
     elif inital_values == '5':
         # Hidden secret intial value
         y_0 = np.array([random.uniform(0, 2*pi), random.uniform(0, 50), random.uniform(0, 2*pi), random.uniform(0,50)])
@@ -115,9 +125,9 @@ def main():
     x_1, y_1 = L * sin(angle1[:]), -L * cos(angle1[:])
     x_2, y_2 = L * sin(angle2[:]) + x_1, -L * cos(angle2[:]) + y_1
     
-    animate_penduli(x_1, y_1, x_2, y_2, n, h)
-    plot(t, angle1, velocity1, "Pendulum 1 (blue pendulum)")
-    plot(t, angle2, velocity2, "Pendulum 2 (red pendulum)")
+    animate_penduli(x_1, y_1, x_2, y_2, n, h, title)
+    plot(t, angle1, velocity1, "Inner pendulum (blue)", title)
+    plot(t, angle2, velocity2, "Outer pendulum (red)", title)
     return
 
 main()
