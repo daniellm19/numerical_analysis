@@ -1,0 +1,81 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from numpy import sin,cos, pi
+
+
+#Global constants
+g = 9.81
+
+def error(k):
+    return pow(10,-k)
+
+def ydot(t:float, y: list, L: float, m:float):
+    theta_1pp = ((m*L*pow(y[1],2)*sin(y[2] - y[0])*cos(y[2] - y[0])) + (m*g*sin(y[2])*cos(y[2] - y[0])) + m * L * pow(y[3],2) * sin(y[2] - y[0]) - (m+m) * g*sin(y[0]))/((m+m)*L - m*L*pow(cos(y[2] - y[0]),2))
+    theta_2pp = (-1*(m*L*pow(y[3],2)*sin(y[2] - y[0])*cos(y[2] - y[0])) + (m+m)*(g*sin(y[0])*cos(y[2] - y[0])-L*pow(y[1], 2) * sin(y[2] - y[0])-g*sin(y[2])))/((m+m)*L - m*L*pow(cos(y[2] - y[0]), 2))
+    return np.array([y[1], theta_1pp, y[3], theta_2pp])
+
+
+def runge_kutta(x, n, T, L: float, m):
+    h = T/n
+    t = 0
+    t_list = []
+    y_list = []
+    for _ in range(n):
+        k1 = ydot(t, x, L, m)
+        k2 = ydot(t + h/2, x + h/2 * k1, L, m)
+        k3 = ydot(t + h/2, x + h/2 * k2, L, m)
+        k4 = ydot(t + h, x + h * k3, L, m)
+        y = np.array(x + h * (k1/6 + k2/3 + k3/3 + k4/6))
+        y_list.append(y)
+        x = y
+        t += h
+        t_list.append(t)
+    return y_list, t_list, h
+
+# plotting the bar chart...
+def plot_errors_at_T40(inner_error, outer_error):
+    fig = plt.figure(figsize=(12, 7))  
+    plt.subplots_adjust(top=0.92, left=0.1, right=0.96, hspace=0.3, bottom=0.1)
+    inner_bar = fig.add_subplot(1, 2, 1)
+    outer_bar = fig.add_subplot(1, 2, 2)
+    x_axis = np.arange(1, len(inner_error) + 1)
+    y_label = "Difference in angle [rad]"
+    
+    inner_bar.bar(x_axis+0.2, inner_error, color='blue', width=0.5, label="Inner pendulum error")
+    outer_bar.bar(x_axis, outer_error, color='red', width=0.5, label="Outer pendulum error")
+    inner_bar.set_xlabel('k'), inner_bar.set_ylabel(y_label)
+    outer_bar.set_xlabel('k'), outer_bar.set_ylabel(y_label)
+    inner_bar.legend()
+    outer_bar.legend()
+    inner_bar.set_xticks(np.arange(1, 13, step=1))
+    outer_bar.set_xticks(np.arange(1, 13, step=1))
+    plt.suptitle("Error in double penduli with starting error 10^(-k) where k ∈ {1, 2, · · ·, 12}", size=15)
+    plt.show()
+
+def main():
+    # non changing constants
+    k = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    L = 2
+    m = 1
+    
+    # problem 12 changable values, with benchmarks commented
+    T = 40  # 40  low: 5, high: 200
+    n = 500 # 500 low: 50, high: 5000
+    y0 = np.array([pi, 2, pi/12, 4]) # [2pi/2, 0, pi/6, 0] from problem 11. low: [0, 0, pi/12, 0], high: []
+    
+    y, t, h = runge_kutta(y0, n, T, L, m)
+    angle1, velocity1, angle2, velocity2 = map(list, zip(*y))
+    inner_T40 = angle1[-1]
+    outer_T40 = angle2[-1]
+    inner_pendulum_error = []
+    outer_pendulum_error = []
+    for num in k:
+        y0 = np.array([2*pi/3+error(num), 0, pi/6 + error(num), 0])
+        y_n, t_n, h_n = runge_kutta(y0, n, T, L, m)
+        angle1, velocity1, angle2, velocity2 = map(list, zip(*y_n))
+        inner_pendulum_error.append(abs(angle1[-1] - inner_T40))
+        outer_pendulum_error.append(abs(angle2[-1] - outer_T40))
+    
+    plot_errors_at_T40(inner_pendulum_error, outer_pendulum_error)  
+
+main()
