@@ -9,12 +9,11 @@ def nlbvpfd(inter, bv, n):
     old_w = w + 2 * 1e-5
     while np.linalg.norm(w-old_w, np.inf)>1e-5:	# Newton
         old_w = w
-        print(w)
         s = - np.linalg.solve(jac(w, h), f(w, h))
         w += s
-
-
+    plt.subplot(1, 2, 1)
     plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
+    plt.title("Calculated approximation")
     return w
 
 def f(w, h):
@@ -40,6 +39,21 @@ n = 40
 a = 0
 b = 1
 w = nlbvpfd([a,b],[1,-1],  n)
-print(w)
 
+
+def actual_solution(x):
+    return -0.5820*pow(np.e, x) + 1.5820*pow(np.e, -x)
+
+h = 1/1000
+interval = []
+y_values = []
+k = 0
+plt.subplot(1, 2, 2)
+plt.title("Actual solution")
+while k <= 1:
+    interval.append(k)
+    y_values.append(actual_solution(k))
+    k += h
+    
+plt.plot(interval, y_values, c='r')
 plt.show()
