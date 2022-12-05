@@ -2,13 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def nlbvpfd(inter, bv, n):
-	[a,b] = inter; [ya,yb] = bv
-	h = (b-a)/(n+1)
-	w = np.zeros(n)				# Initial guess for Newton
-	for _ in range(50):			# Newton
-		w -= np.linalg.solve( jac(w, h), f(w, h) )
-	plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
-	return w
+    [a,b] = inter; [ya,yb] = bv
+    h = (b-a)/(n+1)
+    w = np.ones(n)				# Initial guess for Newton
+    for _ in range(20):			# Newton
+        w -= np.linalg.solve(jac(w, h), f(w, h))
+        print(w)
+
+
+    plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
+    return w
 
 def f(w, h):
 	n = len(w)
