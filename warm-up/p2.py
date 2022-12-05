@@ -7,21 +7,21 @@ def nlbvpfd(inter, bv, n):
 	h = (b-a)/(n+1)
 	w = np.zeros(n)				# initialize solution array w
 	for i in range(20):			# loop of Newton step
-		w -= np.linalg.solve( jac(w, h, ya, yb), f(w, h, ya, yb) )
+		w -= np.linalg.solve( jac(w, h), f(w, h) )
 								# plot w with boundary data
 	plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
 	return w
 
-def f(w, h, ya, yb):
+def f(w, h):
 	n = len(w)
 	y = np.zeros(n)
-	y[ 0] = ya
-	y[-1] = yb
+	y[ 0] = 1
+	y[-1] = -1
 	for i in range(1,n-1):
-		y[i] =  w[i-1] - w[ i] * (2 + pow(h, 2)) + w[i+1]
+		y[i] =  w[i-1] - w[i] * (2 + pow(h, 2)) + w[i+1]
 	return y
 
-def jac(w, h, ya, yb):
+def jac(w, h):
 	n = len(w)
 	a = np.zeros((n,n))
 	for i in range(n):
