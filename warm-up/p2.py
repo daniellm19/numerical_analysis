@@ -2,20 +2,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def nlbvpfd(inter, bv, n):
-			# needed in f and jac functions
 	[a,b] = inter; [ya,yb] = bv
 	h = (b-a)/(n+1)
-	w = np.zeros(n)				# initialize solution array w
-	for i in range(20):			# loop of Newton step
+	w = np.zeros(n)				# Initial guess for Newton
+	for _ in range(50):			# Newton
 		w -= np.linalg.solve( jac(w, h), f(w, h) )
-								# plot w with boundary data
 	plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
 	return w
 
 def f(w, h):
 	n = len(w)
 	y = np.zeros(n)
-	y[ 0] = 1
+	y[0] = 1
 	y[-1] = -1
 	for i in range(1,n-1):
 		y[i] =  w[i-1] - w[i] * (2 + pow(h, 2)) + w[i+1]
