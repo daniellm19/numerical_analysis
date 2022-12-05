@@ -1,34 +1,40 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
-# constants
-T = 1
-n = 100
-h = T/n
-y_a = 1
-y_b = -1
+def nlbvpfd(inter, bv, n):
+			# needed in f and jac functions
+	[a,b] = inter; [ya,yb] = bv
+	h = (b-a)/(n+1)
+	w = np.zeros(n)				# initialize solution array w
+	for i in range(20):			# loop of Newton step
+		w -= np.linalg.solve( jac(w, h, ya, yb), f(w, h, ya, yb) )
+								# plot w with boundary data
+	plt.plot( np.linspace(a,b,n+2), np.hstack((ya,w,yb)), linewidth=2)
+	return w
 
-def nlbvpfd():
-    w = np.zeros(n)
-    for i in range(20):
-        w = w - np.linalg.solve(jac(w), f(w))
-    
-    return w
+def f(w, h, ya, yb):
+	n = len(w)
+	y = np.zeros(n)
+	y[ 0] = ya
+	y[-1] = yb
+	for i in range(1,n-1):
+		y[i] =  w[i-1] - w[ i] * (2 + pow(h, 2)) + w[i+1]
+	return y
 
-def f(w):
-    y = np.zeros(n)
-    y[0] = y_a - w[0]*pow(h,2) + w[1]
-    y[n-1] = w[n-2] - w[n-1]*pow(h, 2) + y_b
-   
-    
-def jac(w):
-    a = np.zeros((n,n))
-    for i in range(1, n):
-        a[i-1][i-1] = w[i-2] - w[i-1]*(2+pow(h, 2)) + w[i]
-        
-    for i in range(1, n):
-        a[i-1][i] = 1
-        a[i][i-1] = 1
+def jac(w, h, ya, yb):
+	n = len(w)
+	a = np.zeros((n,n))
+	for i in range(n):
+		a[i,i] = - (2 + pow(h, 2))
+	for i in range(n-1):
+		a[i,i+1] = 1
+		a[i+1,i] = 1
+	return a
 
-w = nlbvpfd()
+n = 40
+a = 0
+b = 1
+w = nlbvpfd([a,b],[1,-1],  n)
 print(w)
-    
+print('Actual solution:', -0.5820 * pow(np.e, 1) + 1.5820 * pow(np.e, -1))
+plt.show()
