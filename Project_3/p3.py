@@ -1,39 +1,78 @@
-from mpl_toolkits.mplot3d import axes3d, Axes3D
-import matplotlib.pyplot as plt
 import numpy as np
-
-def heatbdn(xl,xr,yb,yt,M,N,f):
-	D = 1.									# diffusion coefficient
-	h = float(xr-xl)/M; k=float(yt-yb)/N; m=M+1; n=N
-	sigma = D*k/(h*h)
-	a  = np.diag(1+2*sigma*np.ones(m)) + np.diag(-sigma*np.ones(m-1),1) 
-	a += np.diag(-sigma*np.ones(m-1),-1)			# define matrix a
-	a[  0,:] = np.hstack([-3, 4, -1, np.zeros(m-3)]) 	# Neumann conditions
-	a[m-1,:] = np.hstack([np.zeros(m-3), -1, 4, -3]) 
-	xvals = np.linspace(xl,xr,M+1)
-	tvals = np.linspace(yb,yt,N+1)	
-	w = np.zeros((m,N+1))   					# 2nd index is time index
-	w[:,0] = f(xvals)						# initial conditions
-	for j in range(n):
-		b = w[:,j].copy(); b[0]=0; b[m-1]=0
-		w[:,j+1] = np.linalg.solve(a,b) 
-	print(w)
-	[x,t] = np.meshgrid(xvals,tvals)			# 3-D plot of solution w
-	fig = plt.figure()
-	ax = fig.add_subplot(111, projection='3d')
-	ax.plot_wireframe(x, t, w.T, rstride=1, cstride=1)
-	ax.set_xlabel('x'); ax.set_ylabel('t'); ax.set_zlabel('w')
-	plt.show()
-	return w
+from numpy import log, linalg as LA
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
+import matplotlib.pyplot as plt
 
 
+#constants
+H = 0.005
+K = 1.68
+P = 5
+L = 2
+delta = 0.1
 
-# test_heatbdn.py
+def mesh(xvals,yvals,w,xlabel='',ylabel='',zlabel=''):
+    x,y = np.meshgrid(xvals,yvals)			# 3-D plot of 2D array w
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_wireframe(x, y, w, rstride=1)
+    ax.set_xlabel(xlabel); ax.set_ylabel(ylabel); ax.set_zlabel(zlabel)
+    surf = ax.plot_surface(xvals,yvals,w, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+    plt.show()
 
-def f(x):
-	return np.sin(2*np.pi*x)**2
+def f(x,y):
+    return 0
 
-np.set_printoptions(precision=14,linewidth=250)
+def g1(x):
+    return -(H/K) * x
 
-w = heatbdn(0,1,0,0.2,4,5,f)
-print(w)
+def g2(x): 
+    return -(H/K) * x
+
+def g3(y): # Left
+    return - P/(delta * K *L)
+
+def g4(y): 
+    return - (H/K) * y
+
+
+def poisson(xl,xr,yb,yt,M,N):
+    m = M+1
+    n = N+1 
+    h = (xr-xl)/M
+    k = (yt-yb)/N
+    x = np.linspace(xl,xr,m) # set mesh values 
+    y = np.linspace(yb,yt,n)
+    A = np.zeros((m*n,m*n))
+    b = np.zeros(m*n) 
+    for i in range(1,m-1):  # interior points 
+        for j in range(1,n-1):
+            A[i+j*m,i-1+j*m] = 1/pow(h, 2)
+            A[i+j*m,i+1+j*m] = 1/pow(h, 2)
+            A[i+j*m,i  +j*m] = (2*H)/(K*delta)
+            A[i+j*m,i  +(j-1)*m] = 1/pow(k, 2)
+            A[i+j*m,i  +(j+1)*m] = 1/pow(k, 2)
+            b[i+j*m] = f(x[i],y[j]) 
+    for i in range(m): 		# bottom and top boundary points 
+        j = 0  
+        A[i+j*m,i+j*m] = 1
+        b[i+j*m] = g1(x[i]) 
+        j = n-1
+        A[i+j*m,i+j*m] = 1
+        b[i+j*m] = g2(x[i]) 
+    for j in range(1,n-1):	# left and right boundary points 
+        i = 0
+        A[i+j*m,i+j*m] = 1
+        b[i+j*m] = g3(y[j]) 
+        i = m-1
+        A[i+j*m,i+j*m] = 1
+        b[i+j*m] = g4(y[j]) 
+    v = LA.solve(A,b)	# solve for solution in v labeling 
+    w = np.reshape(v,(m,n),order='F') #translate from v to w
+    print(w)
+    mesh(x,y,w.T,'x','y','w') 
+    return w
+
+poisson(0,2,0,2,10,10) 
