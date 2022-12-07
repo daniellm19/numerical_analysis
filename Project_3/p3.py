@@ -84,17 +84,16 @@ def poisson(xl,xr,yb,yt,M,N):
     plt.show()
     # Þessi hluti er frekar sus, mundi definitely check'a á honum
     for j in range(n-2,0,-1):	# left and right boundary points 
-        y_loc = i+j*m
         i = 0
-        A[y_loc,i+j*m] = const_6(h)
-        A[y_loc, i+1+j*m] = -const_3(h)
-        A[y_loc, i+2+j*m] = const_3(h)
-        b[y_loc] = power_constant() # This assumes that all of the left side is power
+        A[i+j*m,i+j*m] = const_6(h)
+        A[i+j*m, i+1+j*m] = -const_3(h)
+        A[i+j*m, i+2+j*m] = const_3(h)
+        b[i+j*m] = power_constant() # This assumes that all of the left side is power
         i = m-1
-        A[y_loc,i+j*m] = const_1(h)
-        A[y_loc, i-1+j*m] = const_2(h)
-        A[y_loc, i-2+j*m] = const_3(h)
-        b[y_loc] = 0 
+        A[i+j*m,i+j*m] = const_1(h)
+        A[i+j*m, i-1+j*m] = const_2(h)
+        A[i+j*m, i-2+j*m] = const_3(h)
+        b[i+j*m] = 0 
     v = LA.solve(A,b)	# solve for solution in v labeling 
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
