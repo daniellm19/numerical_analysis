@@ -22,57 +22,108 @@ def mesh(xvals,yvals,w,xlabel='',ylabel='',zlabel=''):
     fig.colorbar(surf, shrink=0.5, aspect=5)
     plt.show()
 
-def f(x,y):
-    return 0
-
-def g1(x):
-    return -(H/K) * x
-
-def g2(x): 
-    return -(H/K) * x
-
-def g3(y): # Left
+def power_constant():
     return - P/(delta * K *L)
 
-def g4(y): 
-    return - (H/K) * y
+def const_1(k_or_h):
+    return (-3/(2*k_or_h) + H/K)
 
+def const_2(k_or_h):
+    return (2/k_or_h)
+
+def const_3(k_or_h):
+    return -(1/(2*k_or_h))
+
+def const_4(k,h):
+    return -(2*((1/k)+(1/h)))
+
+def const_5(k_or_h):
+    return (1/pow(k_or_h,2))
+
+def const_6(h):
+    return (-3/(2*h))
 
 def poisson(xl,xr,yb,yt,M,N):
     m = M+1
     n = N+1 
     h = (xr-xl)/M
     k = (yt-yb)/N
-    x = np.linspace(xl,xr,m) # set mesh values 
+    x = np.linspace(xl,xr,m)    # set mesh values 
     y = np.linspace(yb,yt,n)
-    A = np.zeros((m*n,m*n))
+    A = np.zeros((m*n,m*n))     # The A matrix is the reverse of what is seen in the
+                                # lectures because numpy's indexing is insane and
+                                # I won't bother to change it
     b = np.zeros(m*n) 
     for i in range(1,m-1):  # interior points 
-        for j in range(1,n-1):
-            A[i+j*m,i-1+j*m] = 1/pow(h, 2)
-            A[i+j*m,i+1+j*m] = 1/pow(h, 2)
-            A[i+j*m,i  +j*m] = (2*H)/(K*delta)
-            A[i+j*m,i  +(j-1)*m] = 1/pow(k, 2)
-            A[i+j*m,i  +(j+1)*m] = 1/pow(k, 2)
-            b[i+j*m] = f(x[i],y[j]) 
+        for j in range(n-2,0,-1):
+            A[(i-1)+j*m,i+j*m] = const_5(k)      # The left node
+            A[(i+1)+j*m,i+j*m] = const_5(k)      # The right node 
+            A[i+j*m,i+j*m] = const_4(k,h)  # The node itself
+            A[i+(j-1)*m,i+j*m] = const_5(k)  # The bottom node
+            A[i+(j+1)*m,i+j*m] = const_5(k)  # The top node
+            b[i+j*m] = 0             # What the hell is this?
+    plt.imshow(A)
+    plt.colorbar()
+    plt.show()
     for i in range(m): 		# bottom and top boundary points 
-        j = 0  
-        A[i+j*m,i+j*m] = 1
-        b[i+j*m] = g1(x[i]) 
-        j = n-1
-        A[i+j*m,i+j*m] = 1
-        b[i+j*m] = g2(x[i]) 
-    for j in range(1,n-1):	# left and right boundary points 
+        j = n-1               # Top
+        A[i+j*m,i+j*m] = const_1(k)  # Why is it set to one?
+        A[i+(j-1)*m,i+j*m] = const_2(k)  # This needs to be error checked
+        A[i+(j-2)*m,i+j*m] = const_3(k)  # This needs to be error checked
+        b[i+j*m] = 0 # I think this doesn't make sense, we already have all boundary conditions
+        j = 0             # Bottom
+        A[i+j*m,i+j*m] = const_1(k)  # Why?
+        A[i+(j+1)*m,i+j*m] = const_2(k)  # This needs to be error checked
+        A[i+(j+2)*m,i+j*m] = const_3(k)  # This needs to be error checked
+        b[i+j*m] = 0 # Why?
+    for j in range(n-2,0,-1):	# left and right boundary points 
         i = 0
-        A[i+j*m,i+j*m] = 1
-        b[i+j*m] = g3(y[j]) 
+        A[i+j*m,i+j*m] = const_6(h)
+        A[i+1+j*m,i+j*m] = -const_3(h)
+        A[i+2+j*m,i+j*m] = const_3(h)
+        b[i+j*m] = power_constant() # This assumes that all of the left side is power
         i = m-1
-        A[i+j*m,i+j*m] = 1
-        b[i+j*m] = g4(y[j]) 
+        A[i+j*m,i+j*m] = const_1(h)
+        A[i-1+j*m,i+j*m] = const_2(h)
+        A[i-2+j*m,i+j*m] = const_3(h)
+        b[i+j*m] = 0 
     v = LA.solve(A,b)	# solve for solution in v labeling 
     w = np.reshape(v,(m,n),order='F') #translate from v to w
-    print(w)
-    mesh(x,y,w.T,'x','y','w') 
-    return w
 
-poisson(0,2,0,2,10,10) 
+    print(f"A: {A}")
+    print(f"b: {b}")
+
+    plt.imshow(A)
+    plt.colorbar()
+    plt.show()
+    mesh(x,y,w.T,'x','y','w') 
+    return "ok"
+
+def fill_equation(n,m,low,high):
+    A = np.zeros((n,m))
+    for i in range(0,n):    # The y-axis, 0 is the top, n-1 is the bottom
+        for j in range(0,m):# The x-axis, 0 is the left, n-1 is the right
+            if i==0:
+                A[i,j] = 3  # Top side
+                continue
+            elif i==(m-1):
+                A[i,j] = 4  # Bottom side
+                continue
+            elif j==0:
+                if ((low<=i) and (i<=high)):
+                    A[i,j] = 6  # Power side
+                    continue
+                else:
+                    A[i,j] = 1  # Left side
+                    continue
+            elif j == (n-1):
+                A[i,j] = 2  # Right side
+                continue
+            else:
+                A[i,j] = 5  # Inside
+    
+    return A
+
+w = poisson(0.2,0.1,0.2,0.1,10,10)
+#A = fill_equation(5,5,1,2)
+#print(A)
