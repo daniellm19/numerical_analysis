@@ -44,8 +44,8 @@ def const_6(h):
     return (-3/(2*h))
 
 def poisson(xl,xr,yb,yt,M,N):
-    m = M+1
-    n = N+1 
+    m = M
+    n = N
     h = (xr-xl)/M
     k = (yt-yb)/N
     x = np.linspace(xl,xr,m)    # set mesh values 
@@ -56,37 +56,45 @@ def poisson(xl,xr,yb,yt,M,N):
     b = np.zeros(m*n) 
     for i in range(1,m-1):  # interior points 
         for j in range(n-2,0,-1):
-            A[(i-1)+j*m,i+j*m] = const_5(k)      # The left node
-            A[(i+1)+j*m,i+j*m] = const_5(k)      # The right node 
-            A[i+j*m,i+j*m] = const_4(k,h)  # The node itself
-            A[i+(j-1)*m,i+j*m] = const_5(k)  # The bottom node
-            A[i+(j+1)*m,i+j*m] = const_5(k)  # The top node
-            b[i+j*m] = 0             # What the hell is this?
+            y_loc = i+j*m
+            print(y_loc)
+            A[y_loc, (i-1)+j*m,] = const_5(k)      # The left node
+            A[y_loc, (i+1)+j*m] = const_5(k)      # The right node 
+            A[y_loc, i+j*m] = const_4(k,h)  # The node itself
+            A[y_loc, i+(j-1)*m] = const_5(k)  # The bottom node
+            A[y_loc, i+(j+1)*m] = const_5(k)  # The top node
+            b[y_loc] = 0             # What the hell is this?
     plt.imshow(A)
     plt.colorbar()
     plt.show()
     for i in range(m): 		# bottom and top boundary points 
+        # You should look at i like 1 here and j like 1 as well
         j = n-1               # Top
-        A[i+j*m,i+j*m] = const_1(k)  # Why is it set to one?
-        A[i+(j-1)*m,i+j*m] = const_2(k)  # This needs to be error checked
-        A[i+(j-2)*m,i+j*m] = const_3(k)  # This needs to be error checked
+        A[i+j*m, i+j*m] = const_1(k)  # Why is it set to one?
+        A[i+j*m, i+(j-1)*m] = const_2(k)  # This needs to be error checked
+        A[i+j*m, i+(j-2)*m] = const_3(k)  # This needs to be error checked
         b[i+j*m] = 0 # I think this doesn't make sense, we already have all boundary conditions
         j = 0             # Bottom
         A[i+j*m,i+j*m] = const_1(k)  # Why?
-        A[i+(j+1)*m,i+j*m] = const_2(k)  # This needs to be error checked
-        A[i+(j+2)*m,i+j*m] = const_3(k)  # This needs to be error checked
+        A[i+j*m, i+(j+1)*m] = const_2(k)  # This needs to be error checked
+        A[i+j*m, i+(j+2)*m] = const_3(k)  # This needs to be error checked
         b[i+j*m] = 0 # Why?
+    plt.imshow(A)
+    plt.colorbar()
+    plt.show()
+    # Þessi hluti er frekar sus, mundi definitely check'a á honum
     for j in range(n-2,0,-1):	# left and right boundary points 
+        y_loc = i+j*m
         i = 0
-        A[i+j*m,i+j*m] = const_6(h)
-        A[i+1+j*m,i+j*m] = -const_3(h)
-        A[i+2+j*m,i+j*m] = const_3(h)
-        b[i+j*m] = power_constant() # This assumes that all of the left side is power
+        A[y_loc,i+j*m] = const_6(h)
+        A[y_loc, i+1+j*m] = -const_3(h)
+        A[y_loc, i+2+j*m] = const_3(h)
+        b[y_loc] = power_constant() # This assumes that all of the left side is power
         i = m-1
-        A[i+j*m,i+j*m] = const_1(h)
-        A[i-1+j*m,i+j*m] = const_2(h)
-        A[i-2+j*m,i+j*m] = const_3(h)
-        b[i+j*m] = 0 
+        A[y_loc,i+j*m] = const_1(h)
+        A[y_loc, i-1+j*m] = const_2(h)
+        A[y_loc, i-2+j*m] = const_3(h)
+        b[y_loc] = 0 
     v = LA.solve(A,b)	# solve for solution in v labeling 
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
@@ -124,6 +132,6 @@ def fill_equation(n,m,low,high):
     
     return A
 
-w = poisson(0.2,0.1,0.2,0.1,10,10)
+w = poisson(0.2,0.1,0.2,0.1,4,4)
 #A = fill_equation(5,5,1,2)
 #print(A)
