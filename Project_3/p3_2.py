@@ -23,7 +23,7 @@ def mesh(xvals,yvals,w,xlabel='',ylabel='',zlabel=''):
     plt.show()
 
 def power_constant():
-    return - P/(delta * K *L)
+    return  -P/(delta * K *L)
 
 def const_1(k_or_h):
     return (-3/(2*k_or_h) + H/K)
@@ -35,7 +35,7 @@ def const_3(k_or_h):
     return -(1/(2*k_or_h))
 
 def const_4(k,h):
-    return -2*((1/pow(k,2))+(1/pow(h,2)))
+    return (-2*((1/pow(k,2))+(1/pow(h,2))+(H/(K*delta))))
 
 def const_5(k_or_h):
     return (1/pow(k_or_h,2))
@@ -50,8 +50,6 @@ def poisson(xl,xr,yb,yt,M,N):
     k = (yt-yb)/N
     x = np.linspace(xl,xr,m)    # set mesh values 
     y = np.linspace(yb,yt,n)
-    print(f"x: {x}")
-    print(f"y: {y}")
     A = np.zeros((m*n,m*n))     # The A matrix is the reverse of what is seen in the
                                 # lectures because numpy's indexing is insane and
                                 # I won't bother to change it
@@ -99,13 +97,13 @@ def poisson(xl,xr,yb,yt,M,N):
     #plt.colorbar()
     #plt.show()
     v = LA.solve(A,b)	# solve for solution in v labeling 
-    v = [i+20 for i in v]
+    v = [i-20 for i in v]
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
     print(f"A: {A}")
     print(f"b: {b}")
 
-    print(f"w: {v}")
+    print(f"max v: {max(v)}")
     print(f"w: {w}")
 
     fig, ax = plt.subplots()
@@ -149,6 +147,6 @@ def fill_equation(n,m,low,high):
     
     return A
 
-w = poisson(0.1,0,0.1,0,10,10)
+w = poisson(0.1,0,0.1,0,100,100)
 #A = fill_equation(5,5,1,2)
 #print(A)
