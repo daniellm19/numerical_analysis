@@ -35,7 +35,7 @@ def const_3(k_or_h):
     return -(1/(2*k_or_h))
 
 def const_4(k,h):
-    return -(2*((1/k)+(1/h)))
+    return -2*((1/pow(k,2))+(1/pow(h,2)))
 
 def const_5(k_or_h):
     return (1/pow(k_or_h,2))
@@ -57,16 +57,15 @@ def poisson(xl,xr,yb,yt,M,N):
     for i in range(1,m-1):  # interior points 
         for j in range(1,n-1):
             y_loc = i+j*m
-            print(y_loc)
-            A[y_loc, (i-1)+j*m,] = const_5(k)      # The left node
-            A[y_loc, (i+1)+j*m] = const_5(k)      # The right node 
+            A[y_loc, (i-1)+j*m,] = const_5(h)      # The left node
+            A[y_loc, (i+1)+j*m] = const_5(h)      # The right node 
             A[y_loc, i+j*m] = const_4(k,h)  # The node itself
             A[y_loc, i+(j-1)*m] = const_5(k)  # The bottom node
             A[y_loc, i+(j+1)*m] = const_5(k)  # The top node
             b[y_loc] = 0             # What the hell is this?
-    plt.imshow(A)
-    plt.colorbar()
-    plt.show()
+    #plt.imshow(A)
+    #plt.colorbar()
+    #plt.show()
     for i in range(1,m-1): 		# bottom and top boundary points 
         # You should look at i like 1 here and j like 1 as well
         j = n-1               # Top
@@ -79,14 +78,14 @@ def poisson(xl,xr,yb,yt,M,N):
         A[i+j*m, i+(j+1)*m] = const_2(k)  # This needs to be error checked
         A[i+j*m, i+(j+2)*m] = const_3(k)  # This needs to be error checked
         b[i+j*m] = 0 # Why?
-    plt.imshow(A)
-    plt.colorbar()
-    plt.show()
+    #plt.imshow(A)
+    #plt.colorbar()
+    #plt.show()
     # Þessi hluti er frekar sus, mundi definitely check'a á honum
     for j in range(n):	# left and right boundary points 
         i = 0
         A[i+j*m,i+j*m] = const_6(h)
-        A[i+j*m, i+1+j*m] = -const_3(h)
+        A[i+j*m, i+1+j*m] = const_2(h)
         A[i+j*m, i+2+j*m] = const_3(h)
         b[i+j*m] = power_constant() # This assumes that all of the left side is power
         i = m-1
@@ -94,21 +93,24 @@ def poisson(xl,xr,yb,yt,M,N):
         A[i+j*m, i-1+j*m] = const_2(h)
         A[i+j*m, i-2+j*m] = const_3(h)
         b[i+j*m] = 0 
+    #plt.imshow(A)
+    #plt.colorbar()
+    #plt.show()
     v = LA.solve(A,b)	# solve for solution in v labeling 
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
     print(f"A: {A}")
     print(f"b: {b}")
 
-    # fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
 
-    # c = ax.pcolormesh(x, y, w, cmap='RdBu', vmin=w.min(), vmax=w.max())
-    # ax.set_title('pcolormesh')
-    # # set the limits of the plot to the limits of the data
-    # ax.axis([x.min(), x.max(), y.min(), y.max()])
-    # fig.colorbar(c, ax=ax)
+    c = ax.pcolormesh(x, y, w, cmap='RdBu', vmin=w.min(), vmax=w.max())
+    ax.set_title('pcolormesh')
+    # set the limits of the plot to the limits of the data
+    ax.axis([x.min(), x.max(), y.min(), y.max()])
+    fig.colorbar(c, ax=ax)
 
-    # plt.show()
+    plt.show()
 
     plt.imshow(A)
     plt.colorbar()
@@ -141,6 +143,6 @@ def fill_equation(n,m,low,high):
     
     return A
 
-w = poisson(0.02,0.01,0.02,0.01,4,4)
+w = poisson(0.2,0.1,0.2,0.1,4,4)
 #A = fill_equation(5,5,1,2)
 #print(A)
