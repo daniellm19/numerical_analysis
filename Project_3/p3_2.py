@@ -50,6 +50,8 @@ def poisson(xl,xr,yb,yt,M,N):
     k = (yt-yb)/N
     x = np.linspace(xl,xr,m)    # set mesh values 
     y = np.linspace(yb,yt,n)
+    print(f"x: {x}")
+    print(f"y: {y}")
     A = np.zeros((m*n,m*n))     # The A matrix is the reverse of what is seen in the
                                 # lectures because numpy's indexing is insane and
                                 # I won't bother to change it
@@ -97,10 +99,14 @@ def poisson(xl,xr,yb,yt,M,N):
     #plt.colorbar()
     #plt.show()
     v = LA.solve(A,b)	# solve for solution in v labeling 
+    v = [i+20 for i in v]
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
     print(f"A: {A}")
     print(f"b: {b}")
+
+    print(f"w: {v}")
+    print(f"w: {w}")
 
     fig, ax = plt.subplots()
 
@@ -143,6 +149,6 @@ def fill_equation(n,m,low,high):
     
     return A
 
-w = poisson(0.2,0.1,0.2,0.1,4,4)
+w = poisson(0.1,0,0.1,0,10,10)
 #A = fill_equation(5,5,1,2)
 #print(A)
