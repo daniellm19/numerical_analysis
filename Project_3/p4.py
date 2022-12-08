@@ -12,73 +12,59 @@ P = 5
 L = 2
 delta = 0.1
 
-def power_constant():
-    return  -P/(delta * K *L)
-
-def const_1(k_or_h):
-    return (-3/(2*k_or_h) + H/K)
-
-def const_2(k_or_h):
-    return (2/k_or_h)
-
-def const_3(k_or_h):
-    return -(1/(2*k_or_h))
-
-def const_4(k,h):
-    return (-2*((1/pow(k,2))+(1/pow(h,2))+(H/(K*delta))))
-
-def const_5(k_or_h):
-    return (1/pow(k_or_h,2))
-
-def const_6(h):
-    return (-3/(2*h))
-
 def poisson(xl,xr,yb,yt,M,N):
-    m = M
-    n = N
-    h = (xr-xl)/M
-    k = (yt-yb)/N
+    mn=(M+1)*(N+1)
+    m = M+1
+    n = N+1
+    Lx = (xr-xl)
+    Ly = (yt-yb)
+    h = Lx/(M)
+    k = Ly/(N)
     x = np.linspace(xl,xr,m)    # set mesh values 
     y = np.linspace(yb,yt,n)
-    A = np.zeros((m*n,m*n))     # The A matrix is the reverse of what is seen in the
-                                # lectures because numpy's indexing is insane and
-                                # I won't bother to change it
-    b = np.zeros(m*n) 
-    for i in range(1,m-1):  # interior points 
-        for j in range(1,n-1):
-            y_loc = i+j*m
-            A[y_loc, (i-1)+j*m,] = const_5(h)      # The left node
-            A[y_loc, (i+1)+j*m] = const_5(h)      # The right node 
-            A[y_loc, i+j*m] = const_4(k,h)  # The node itself
-            A[y_loc, i+(j-1)*m] = const_5(k)  # The bottom node
-            A[y_loc, i+(j+1)*m] = const_5(k)  # The top node
-            b[y_loc] = 0             # What the hell is this?
-    for i in range(1,m-1): 		# bottom and top boundary points 
-        # You should look at i like 1 here and j like 1 as well
-        j = n-1               # Top
-        A[i+j*m, i+j*m] = const_1(k)  # Why is it set to one?
-        A[i+j*m, i+(j-1)*m] = const_2(k)  # This needs to be error checked
-        A[i+j*m, i+(j-2)*m] = const_3(k)  # This needs to be error checked
-        b[i+j*m] = 0 # I think this doesn't make sense, we already have all boundary conditions
-        j = 0             # Bottom
-        A[i+j*m,i+j*m] = const_1(k)  # Why?
-        A[i+j*m, i+(j+1)*m] = const_2(k)  # This needs to be error checked
-        A[i+j*m, i+(j+2)*m] = const_3(k)  # This needs to be error checked
-        b[i+j*m] = 0 # Why?
-    # Þessi hluti er frekar sus, mundi definitely check'a á honum
-    for j in range(n):	# left and right boundary points 
-        i = 0
-        A[i+j*m,i+j*m] = const_6(h)
-        A[i+j*m, i+1+j*m] = const_2(h)
-        A[i+j*m, i+2+j*m] = const_3(h)
-        b[i+j*m] = power_constant() # This assumes that all of the left side is power
-        i = m-1
-        A[i+j*m,i+j*m] = const_1(h)
-        A[i+j*m, i-1+j*m] = const_2(h)
-        A[i+j*m, i-2+j*m] = const_3(h)
-        b[i+j*m] = 0 
-    v = LA.solve(A,b)	# solve for solution in v labeling 
-    v = [i-20 for i in v]
+    A = np.zeros((mn,mn))
+    h2 = pow(h,2)
+    k2 = pow(k,2)
+    b = np.zeros((mn,1)) 
+
+    for i in range(2,m):    # interior points 
+        for j in range(2,n):
+            y_loc = i+(j-1)*m-1
+            A[y_loc, y_loc-1] = 1/h2        # The left node
+            A[y_loc, y_loc+1] = 1/h2        # The right node 
+            A[y_loc, y_loc] =   -((2/k2)+(2/h2)+((2*H)/(K*delta)))  # The node itself
+            A[y_loc, y_loc-m] = 1/k2        # The bottom node
+            A[y_loc, y_loc+m] = 1/k2        # The top node      
+
+    for i in range(2,m):    # Bottom and Top boundary points 
+        j = 1               # Bottom
+        y_loc = i+(j-1)*m-1
+        A[y_loc, y_loc] =       (-3 + (2*h*H/K))
+        A[y_loc, y_loc+m] =     4  
+        A[y_loc, y_loc+m*2] =   -1
+
+        j = n               # Top
+        y_loc = i+(j-1)*m-1
+        A[y_loc, y_loc] =       (-3 + ((2*h*H)/K))
+        A[y_loc, y_loc-m] =     4
+        A[y_loc, y_loc-m*2] =   -1  
+
+    for j in range(1,n+1):	# left and Right boundary points 
+        i = 1               # Power (left)
+        y_loc = i+(j-1)*m-1
+        A[y_loc, y_loc] =       -3
+        A[y_loc, y_loc+1] =     4
+        A[y_loc, y_loc+2] =     -1
+        b[y_loc] = (-2*h*P)/(delta*K*L)
+
+        i = m               # Right
+        y_loc = i+(j-1)*m-1
+        A[y_loc, y_loc] =       (-3 + ((2*h*H)/K))
+        A[y_loc, y_loc-1] =     4
+        A[y_loc, y_loc-2] =     -1
+
+    v = LA.solve(A,b)	    # solve for solution in v labeling 
+    v = [i+20 for i in v]
     w = np.reshape(v,(m,n),order='F') #translate from v to w
     return w
 
