@@ -51,38 +51,34 @@ def poisson(xl,xr,yb,yt,M,N):
     for i in range(2,m):    # Bottom and Top boundary points 
         j = 1               # Bottom
         y_loc = i+(j-1)*m-1
-        A[y_loc, y_loc] =       ((-3/(2*k)) + (H/K))
-        A[y_loc, y_loc+m] =     (2/k)  
-        A[y_loc, y_loc+m*2] =   (-1/(2*k))  
+        A[y_loc, y_loc] =       (-3 + (2*h*H/K))
+        A[y_loc, y_loc+m] =     4  
+        A[y_loc, y_loc+m*2] =   -1
 
         j = n               # Top
         y_loc = i+(j-1)*m-1
-        A[y_loc, y_loc] =       ((-3/(2*k)) + (H/K))
-        A[y_loc, y_loc-m] =     (2/k)
-        A[y_loc, y_loc-m*2] =   (-1/(2*k))  
+        A[y_loc, y_loc] =       (-3 + ((2*h*H)/K))
+        A[y_loc, y_loc-m] =     4
+        A[y_loc, y_loc-m*2] =   -1  
 
     for j in range(1,n+1):	# left and Right boundary points 
         i = 1               # Power (left)
         y_loc = i+(j-1)*m-1
-        A[y_loc, y_loc] =   -3
-        A[y_loc, y_loc+1] = 4
-        A[y_loc, y_loc+2] = -1
+        A[y_loc, y_loc] =       -3
+        A[y_loc, y_loc+1] =     4
+        A[y_loc, y_loc+2] =     -1
         b[y_loc] = (-2*h*P)/(delta*K*L)
 
         i = m               # Right
         y_loc = i+(j-1)*m-1
-        A[y_loc, y_loc] =   (-3 + ((2*h*H)/K))
-        A[y_loc, y_loc-1] = 4
-        A[y_loc, y_loc-2] = -1
+        A[y_loc, y_loc] =       (-3 + ((2*h*H)/K))
+        A[y_loc, y_loc-1] =     4
+        A[y_loc, y_loc-2] =     -1
 
     v = LA.solve(A,b)	    # solve for solution in v labeling 
     v = [i+20 for i in v]
     w = np.reshape(v,(m,n),order='F') #translate from v to w
 
-    print(f"A: {A}")
-    print(f"b: {b}")
-
-    print(f"v: {v}")
     print(f"max v: {max(v)}")
     print(f"w: {w}")
 
