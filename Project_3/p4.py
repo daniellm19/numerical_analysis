@@ -53,9 +53,6 @@ def poisson(xl,xr,yb,yt,M,N):
             A[y_loc, i+(j-1)*m] = const_5(k)  # The bottom node
             A[y_loc, i+(j+1)*m] = const_5(k)  # The top node
             b[y_loc] = 0             # What the hell is this?
-    #plt.imshow(A)
-    #plt.colorbar()
-    #plt.show()
     for i in range(1,m-1): 		# bottom and top boundary points 
         # You should look at i like 1 here and j like 1 as well
         j = n-1               # Top
@@ -68,9 +65,6 @@ def poisson(xl,xr,yb,yt,M,N):
         A[i+j*m, i+(j+1)*m] = const_2(k)  # This needs to be error checked
         A[i+j*m, i+(j+2)*m] = const_3(k)  # This needs to be error checked
         b[i+j*m] = 0 # Why?
-    #plt.imshow(A)
-    #plt.colorbar()
-    #plt.show()
     # Þessi hluti er frekar sus, mundi definitely check'a á honum
     for j in range(n):	# left and right boundary points 
         i = 0
@@ -83,54 +77,26 @@ def poisson(xl,xr,yb,yt,M,N):
         A[i+j*m, i-1+j*m] = const_2(h)
         A[i+j*m, i-2+j*m] = const_3(h)
         b[i+j*m] = 0 
-    #plt.imshow(A)
-    #plt.colorbar()
-    #plt.show()
     v = LA.solve(A,b)	# solve for solution in v labeling 
     v = [i-20 for i in v]
     w = np.reshape(v,(m,n),order='F') #translate from v to w
     return w
 
-def fill_equation(n,m,low,high):
-    A = np.zeros((n,m))
-    for i in range(0,n):    # The y-axis, 0 is the top, n-1 is the bottom
-        for j in range(0,m):# The x-axis, 0 is the left, n-1 is the right
-            if i==0:
-                A[i,j] = 3  # Top side
-                continue
-            elif i==(m-1):
-                A[i,j] = 4  # Bottom side
-                continue
-            elif j==0:
-                if ((low<=i) and (i<=high)):
-                    A[i,j] = 6  # Power side
-                    continue
-                else:
-                    A[i,j] = 1  # Left side
-                    continue
-            elif j == (n-1):
-                A[i,j] = 2  # Right side
-                continue
-            else:
-                A[i,j] = 5  # Inside
-    
-    return A
 
 def deviation(reference, w):
-    print('hæ')
-    return 1
+    difference = [abs(w[0][0] - reference[0][0]), abs(w[-1][0] - reference[-1][0]), abs(w[0][-1] - reference[0][-1]), abs(w[-1][-1] - reference[-1][-1])]
+    return max(difference)
 
 def main():
     ns = ms = list(range(20, 100, 10))
     reference_w = poisson(0.2,0.1,0.2,0.1,100,100)
     too_long, too_much_error, good_values = [], [], []
     for n in ns:
-        print
+        print(n)
         for m in ms:
             start_time = time()
             w = poisson(0.2,0.1,0.2,0.1,m,n)
             duration = time() - start_time
-            print(duration)
             max_deviation = deviation(reference_w, w)
             if duration >= 0.5:
                 too_long.append({'m': m, 'n': n, 'Time': duration})
