@@ -100,6 +100,16 @@ def poisson(xl,xr,yb,yt,M,N):
     print(f"A: {A}")
     print(f"b: {b}")
 
+    # fig, ax = plt.subplots()
+
+    # c = ax.pcolormesh(x, y, w, cmap='RdBu', vmin=w.min(), vmax=w.max())
+    # ax.set_title('pcolormesh')
+    # # set the limits of the plot to the limits of the data
+    # ax.axis([x.min(), x.max(), y.min(), y.max()])
+    # fig.colorbar(c, ax=ax)
+
+    # plt.show()
+
     plt.imshow(A)
     plt.colorbar()
     plt.show()
@@ -131,6 +141,6 @@ def fill_equation(n,m,low,high):
     
     return A
 
-w = poisson(0.2,0.1,0.2,0.1,4,4)
+w = poisson(0.02,0.01,0.02,0.01,4,4)
 #A = fill_equation(5,5,1,2)
 #print(A)
