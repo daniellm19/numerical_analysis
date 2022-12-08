@@ -26,8 +26,10 @@ def poisson(xl,xr,yb,yt,M,N):
     mn=(M+1)*(N+1)
     m = M+1
     n = N+1
-    h = L/(M)
-    k = L/(N)
+    Lx = (xr-xl)
+    Ly = (yt-yb)
+    h = Lx/(M)
+    k = Ly/(N)
     print(f"h: {h}")
     print(f"k: {k}")
     x = np.linspace(xl,xr,m)    # set mesh values 
@@ -36,13 +38,6 @@ def poisson(xl,xr,yb,yt,M,N):
     h2 = pow(h,2)
     k2 = pow(k,2)
     b = np.zeros((mn,1)) 
-
-    print(f"1/h2: {1/h2}")
-    print(f"1/k2: {1/k2}")
-    print(f"-((2/k2)+(2/h2)+((2*H)/(K*delta))): {-((2/k2)+(2/h2)+((2*H)/(K*delta)))}")
-    print(f"((-3/(2*k)) + (H/K)): {((-3/(2*k)) + (H/K))}")
-    print(f"(2/k): {(2/k)}")
-    print(f"(-P)/(delta*K*L): {(-P)/(delta*K*L)}")
 
     for i in range(2,m):    # interior points 
         for j in range(2,n):
@@ -107,5 +102,4 @@ def poisson(xl,xr,yb,yt,M,N):
     mesh(x,y,w.T,'x','y','w') 
     return "ok"
 
-w = poisson(0,0.2,0,0.2,9,9)
-#w = poisson(0,1,1,2,4,4)
+w = poisson(0,2,0,2,9,9)
