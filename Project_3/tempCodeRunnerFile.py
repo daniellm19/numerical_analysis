@@ -1,1 +1,1 @@
-i+j*m
+    fig.colorbar(c, ax=ax)

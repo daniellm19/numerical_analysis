@@ -77,14 +77,14 @@ def poisson(xl,xr,yb,yt,M,N):
 
     v = LA.solve(A,b)	    # solve for solution in v labeling 
     v = [i+20 for i in v]
-    w = np.reshape(v,(m,n),order='F') #translate from v to w
+    w = np.transpose(np.reshape(v,(m,n),order='F')) #translate from v to w
 
     print(f"max v: {max(v)}")
     print(f"w: {w}")
 
     fig, ax = plt.subplots()
 
-    c = ax.pcolormesh(x, y, w, cmap='RdBu', vmin=w.min(), vmax=w.max())
+    c = ax.pcolormesh(x, y, w, cmap='hot_r', vmin=w.min(), vmax=w.max())
     ax.set_title('pcolormesh')
     # set the limits of the plot to the limits of the data
     ax.axis([x.min(), x.max(), y.min(), y.max()])
@@ -92,10 +92,29 @@ def poisson(xl,xr,yb,yt,M,N):
 
     plt.show()
 
-    plt.imshow(A)
-    plt.colorbar()
+    # Plot the mesh
+    x,y = np.meshgrid(x,y)
+    print((x))
+    print((y))
+    norm = plt.Normalize(w.min(), w.max())
+    colors = cm.viridis(norm(w))
+    rcount, ccount, _ = colors.shape
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_wireframe(x, y, w, cmap=cm.coolwarm, linewidth=0, antialiased=False)
+
+    # Add a color bar
+
+    fig.colorbar(c, ax=ax)
+
+    # Show the plot
     plt.show()
-    mesh(x,y,w.T,'x','y','w') 
+
+    #plt.imshow(A)
+    #plt.colorbar()
+    #plt.show()
+    #mesh(x,y,w,'x','y','w') 
     return "ok"
 
-w = poisson(0,2,0,2,9,9)
+w = poisson(0,2,0,2,99,50)

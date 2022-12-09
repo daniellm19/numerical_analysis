@@ -31,5 +31,5 @@ end
 K = 1:0.1:5;
 
 plot(K, P)
-xlabel('K [W/(cm°C)]', 'LineWidth',3)
+xlabel('K [W/(cmï¿½C)]', 'LineWidth',3)
 ylabel('P [W]')
