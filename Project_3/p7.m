@@ -4,15 +4,17 @@ b = 10;
 tol = 0.001;
 allowed_temp = 100;
 K = 1.68;
+H = 0.005;
+delta = 0.1;
 
 
-if sign(max_temp(a, allowed_temp, K))*sign(max_temp(b, allowed_temp, K)) >= 0
+if sign(max_temp(a, allowed_temp, K, H, delta))*sign(max_temp(b, allowed_temp, K, H, delta)) >= 0
     error('f(a)f(b)<0 not satisfied!')
 end
-fa = max_temp(a, allowed_temp, K);
+fa = max_temp(a, allowed_temp, K, H, delta);
 while (b-a)/2>tol
     c=(a+b)/2;
-    fc=max_temp(c, allowed_temp, K);
+    fc=max_temp(c, allowed_temp, K, H, delta);
     if fc == 0              %c is a solution, done
     break
     end

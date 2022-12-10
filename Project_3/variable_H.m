@@ -2,13 +2,13 @@ clear all; close all; clc;
 
 tol = 0.01;
 allowed_temp = 100;
-P = []; % Max power for given K
-H = 0.005;
-delta = 0.1;
+P = []; % Max power for given H
+K = 1.68;
+delta = 0.01;
 
-for K = 1:0.1:5
+for H = 0.005:0.1:3
     a = 0; % Least power
-    b = 15; % Most power
+    b = 300; % Most power
     if sign(max_temp(a, allowed_temp, K, H, delta))*sign(max_temp(b, allowed_temp, K, H, delta)) >= 0
         error('f(a)f(b)<0 not satisfied!')
     end
@@ -26,12 +26,12 @@ for K = 1:0.1:5
         fa = fc;
         end
     end
-    xc=(a+b)/2;               %new midpoint is best estimate
+    xc=(a+b)/2; %new midpoint is best estimate
     P = cat(1, P, xc);
 end
 
-K = 1:0.1:5;
+H = 0.005:0.1:3;
 
-plot(K, P)
-xlabel('K [W/(cm°C)]', 'LineWidth',3)
+plot(H, P)
+xlabel('H [W/(cm^2°C)]', 'LineWidth',3)
 ylabel('P [W]')
