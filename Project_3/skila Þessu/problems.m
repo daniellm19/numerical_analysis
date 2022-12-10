@@ -164,6 +164,8 @@ xlabel('K [W/(cm°C)]', 'LineWidth',3)
 ylabel('P [W]')
 
 %%  Problem 9
+clear all; close all; clc;
+w = poisson_for_p9(0, 4, 0, 4, 20, 20, 0, 1, 5, 1.68, 0.005, true, 8)
 
 %% Problem 10
 clear all; close all; clc;

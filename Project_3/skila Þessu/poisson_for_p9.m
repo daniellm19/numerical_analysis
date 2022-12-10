@@ -1,4 +1,4 @@
-function w=poisson2(xl,xr,yb,yt,M,N,L_start,L_stop,p, K, H, plot, rect_size_points)
+function w=poisson_for_p9(xl,xr,yb,yt,M,N,L_start,L_stop,p, K, H, plot, rect_size_points)
 % Input: rectangle domain [xl,xr]x[yb,yt] with MxN space steps
 % Output: matrix w holding solution values
 % Example usage: w=poisson(0,1,1,2,4,4)
