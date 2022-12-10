@@ -39,7 +39,7 @@ for i=2:m-1 % interior points
     for j=2:n-1
         loc = i+(j-1)*m;
         if S(i,j) == 1
-            A(loc,loc)=0;
+            A(loc,loc)=0.000000001;
             continue     % Landed on forbidden node
         end
         if S(i+1,j) == 1 % Apply right if left to forbidden box
@@ -50,6 +50,13 @@ for i=2:m-1 % interior points
             continue
         end
         if S(i,j+1) == 1 % Apply top if bottom to forbidden box
+            S(i,j) = 4;
+            A(loc,loc)=     (((2*k*H)/K)-3);
+            A(loc,loc-m)=     4;
+            A(loc,loc-2*m)=     -1; 
+            continue
+        end
+        if S(i+1,j+1) == 1 % Apply top if bottom to forbidden box
             S(i,j) = 4;
             A(loc,loc)=     (((2*k*H)/K)-3);
             A(loc,loc-m)=     4;
@@ -74,8 +81,9 @@ for i=2:m-1 % bottom and top boundary points
     A(loc,loc+2*m) =    -1;
 
     j=n;    % Top
+    loc = i+(j-1)*m;
     if S(i,j) == 1
-        A(loc,loc)=0;
+        A(loc,loc)=0.000000001;
         continue     % Landed on forbidden node
     end
     if S(i+1,j) == 1 % Apply right if left to forbidden box
@@ -85,7 +93,6 @@ for i=2:m-1 % bottom and top boundary points
         A(loc,loc-2)=     -1;
         continue
     end
-    loc = i+(j-1)*m;
     S(i,j) = 4;
     A(loc,loc)=     (((2*k*H)/K)-3);
     A(loc,loc-m)=     4;
@@ -100,12 +107,10 @@ for j=1:n % left(power) and right boundary points
     A(loc,loc+1) =    4;
     A(loc,loc+2) =    -1;
     b(loc) =          -((2*h*p)/(L*delta*K));
-    if (j - 1)*k >= L_start && (j -1 )* k <= L_stop
-        b(i+(j-1)*m)=-((2*h*p)/(L*delta*K));
-    end
     i=m;    % right
+    loc = i+(j-1)*m;
     if S(i,j) == 1
-        A(loc,loc)=0;
+        A(loc,loc)=0.0000001;
         continue     % Landed on forbidden node
     end
 %     if (j~=n)
@@ -117,16 +122,20 @@ for j=1:n % left(power) and right boundary points
 %             continue
 %         end
 %     end
-    loc = i+(j-1)*m;
     S(i,j) = 3;
     A(loc,loc)=       (((2*h*H)/K)-3);
     A(loc,loc-1)=     4;
     A(loc,loc-2)=     -1;
 end
+A
 S
 v=(A\b)+20; % solve for solution in v labeling
 w=reshape(v(1:mn),m,n); %translate from v to w
-
+for i=m:-1:(m-rect_size_points+1)
+    for j=n:-1:(n-rect_size_points+1)
+        w(i,j) = NaN;
+    end
+end
 if plot
 mesh(x,y,w')
 end
