@@ -166,6 +166,8 @@ ylabel('P [W]')
 %%  Problem 9
 
 %% Problem 10
+clear all; close all; clc;
+w = poissondoubleP(0,6,0,6,50,50,2,4,1,5,2,7,1.68,0.005,true)
 
 %% Problem 11 - variable H
 clear all; close all; clc;
@@ -207,7 +209,6 @@ xlabel('H [W/(cm^2°C)]', 'LineWidth',3)
 ylabel('P [W]')
 
 %% Problem 12 - Variable delta
-
 clear all; close all; clc;
 
 tol = 0.01;
